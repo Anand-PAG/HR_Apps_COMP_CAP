@@ -1,0 +1,43 @@
+@svc = http://localhost:4004/odata/v4/zhr-comp-cap-crvexcep-srv
+@default_headers=Content-Type: application/json
+
+## ZHR_COMP_CAP_CRVEXCEP_SRV
+GET {{svc}}/$metadata
+
+### ## THRSHLD Get
+GET {{svc}}/BusinessDivisions
+
+### ## ZHR_COMP_CAP_CRVEXCEP_SRV Draft POST
+POST {{svc}}/BusinessDivisions
+Content-Type: application/json
+
+{
+    "year" : 2025,
+    "custBusUnit" : "123",
+    "custDivision":"213"
+}
+
+### ## ZHR_COMP_CAP_CRVEXCEP_SRV DELETE
+
+DELETE {{svc}}/BusinessDivisions(ID='fc4fa62b-7bc2-44e9-94f9-144999269033',year=2025)
+Content-Type: application/json
+
+{
+    "year" : 2025,
+    "custBusUnit" : "123",
+    "custDivision":"213"
+}
+
+### ## ZHR_COMP_CAP_CRVEXCEP_SRV Draft POST
+POST {{svc}}/Thresholds
+Content-Type: application/json
+
+{
+    "year" : 2025,
+    "compaRatioRanges" : "<80%",
+    "startRange":"0",
+    "endRange":"79",
+    "sequence":"10",
+    "fieldUsage":"S"
+}
+

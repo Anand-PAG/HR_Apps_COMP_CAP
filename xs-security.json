@@ -1,0 +1,24 @@
+{
+  "xsappname": "ZHR_COMPMODEL_CAP",
+  "tenant-mode": "dedicated",
+  "description": "Compensation Model Platform",
+  "scopes": [
+    {
+      "name": "uaa.user",
+      "description": "UAA Service",
+      "grant-as-authority-to-apps": [
+        "$XSAPPNAME(application, xsappforclientapp)"
+      ]
+    }
+  ],
+  "attributes": [],
+  "role-templates": [
+    {
+      "name": "Token_Exchange",
+      "description": "UAA",
+      "scope-references": [
+        "uaa.user"
+      ]
+    }
+  ]
+}

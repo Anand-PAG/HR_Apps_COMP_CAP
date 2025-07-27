@@ -1,0 +1,48 @@
+{
+  "name": "ZHR_COMPMODEL_CAP",
+  "version": "1.0.0",
+  "description": "A simple CAP project.",
+  "repository": "<Add your repository here>",
+  "license": "UNLICENSED",
+  "private": true,
+  "dependencies": {
+    "@cap-js/hana": "^2",
+    "@sap/cds": "^9",
+    "@sap/xssec": "^4",
+    "express": "^4"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "devDependencies": {
+    "@cap-js/cds-types": "^0.13.0",
+    "@cap-js/sqlite": "^2",
+    "@sap/cds-dk": ">=8",
+    "mbt": "^1.2.29",
+    "prettier": "^3.4.2",
+    "rimraf": "^5.0.5"
+  },
+  "scripts": {
+    "start": "cds-serve",
+    "start:hybrid": "cds watch --profile hybrid",
+    "setup:hybrid": "npm run bind:db && npm run bind:uaa && npm run bind:dest",
+    "clean": "rimraf resources mta_archives mta-op* Makefile* gen app/**/dist",
+    "prebuild": "npm run clean",
+    "build": "rimraf resources mta_archives && mbt build --mtar archive",
+    "deploy": "cf deploy mta_archives/archive.mtar --retries 1",
+    "deploy:cf": "npm run build && npm run deploy && npm run clean",
+    "postdeploy": "npm run clean",
+    "undeploy": "cf undeploy ZHR_COMPMODEL_CAP --delete-services --delete-service-keys --delete-service-brokers",
+    "deploy:db": "cds deploy --to hana:ZHR_COMPMODEL_CAP-db",
+    "bind:db": "cds bind db --to ZHR_COMPMODEL_CAP-db",
+    "bind:uaa": "cds bind -2 ZHR_COMPMODEL_CAP-xsuaa-srv",
+    "bind:dest": "cds bind -2 ZHR_COMPMODEL_CAP-destination-service"
+  },
+  "cds": {
+    "requires": {
+      "[production]": {
+        "auth": "xsuaa"
+      }
+    }
+  }
+}
