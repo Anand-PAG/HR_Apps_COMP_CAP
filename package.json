@@ -8,8 +8,13 @@
   "dependencies": {
     "@cap-js/hana": "^2",
     "@sap/cds": "^9",
+    "@sap/xsenv": "^5.6.1",
     "@sap/xssec": "^4",
-    "express": "^4"
+    "csv-parser": "^3.2.0",
+    "express": "^4",
+    "fs": "^0.0.1-security",
+    "ssh2-sftp-client": "^12.0.1",
+    "xlsx": "^0.18.5"
   },
   "engines": {
     "node": ">=20"
@@ -42,6 +47,9 @@
     "requires": {
       "[production]": {
         "auth": "xsuaa"
+      },
+      "[hybrid]": {
+        "auth": "mocked"
       }
     }
   }
