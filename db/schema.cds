@@ -1,12 +1,12 @@
 namespace com.compmodel;
-
 using {
     cuid,
     managed,
 } from '@sap/cds/common';
 
 // Threshold Master Table
-entity ZHR_COMP_TBL_THRSHLD_MASTER : cuid, managed {
+entity ZHR_COMP_TBL_THRSHLD_MASTER :  managed {
+    key ID            : UUID;
     key year             : Integer   @assert.range : [
             1000,
             9999
@@ -18,22 +18,24 @@ entity ZHR_COMP_TBL_THRSHLD_MASTER : cuid, managed {
         endRange         : String(3) @assert.format: '^[0-9]{1,3}$';
         //    performanceRating  : String(20);
         sequence         : String(3) @assert.format: '^[0-9]{1,3}$';
-        fieldUsage       : String(1) @asser.range  : [
+        fieldUsage       : String(1) @assert.range  : [
             'A',
             'O',
             'S'
         ]; //A- Active,O-Obselete,S-Save
+
 }
 
 // SubZone Master Table
-entity ZHR_COMP_TBL_SUBZONE_MASTER : cuid, managed {
+entity ZHR_COMP_TBL_SUBZONE_MASTER :  managed {
+    key ID            : UUID;
     key year             : Integer   @assert.range : [
             1000,
             9999
         ];
     performanceSubZone : String(10);
     sequence           : String(3) @assert.format: '^[0-9]{1,3}$';
-    fieldUsage         : String(1) @asser.range  : [
+    fieldUsage         : String(1) @assert.range  : [
         'A',
         'O',
         'S'
@@ -41,7 +43,8 @@ entity ZHR_COMP_TBL_SUBZONE_MASTER : cuid, managed {
 }
 
 // Comp Master Table
-entity ZHR_COMP_TBL_COMPRATIO_MASTER : cuid, managed {
+entity ZHR_COMP_TBL_COMPRATIO_MASTER :  managed {
+    key ID            : UUID;
     key year               : Integer   @assert.range: [
             1000,
             9999
@@ -54,16 +57,18 @@ entity ZHR_COMP_TBL_COMPRATIO_MASTER : cuid, managed {
         performanceRating  : String(50); //Performance Rating C,C++
         thresholdFrom      : Decimal(5, 2) default 0.00;
         thresholdTo        : Decimal(5, 2) default 0.00;
-        status             : String(1) @asser.range : [
+        status             : String(1) @assert.enum : [
             'A',
             'O',
             'S'
         ];
+        path : String;
 }
 
 // CRV Exception Master Table
-entity ZHR_COMP_TBL_CRV_EXPTN_MASTER : cuid, managed {
-    key field_id                 : String(30);
+entity ZHR_COMP_TBL_CRV_EXPTN_MASTER : managed {
+    key ID            : UUID;
+    key field_id                 : String(40);
     key custPERNR                : String(20);
         executiveRuleViolation   : String(1);
         mgrFirstName             : String(60);
@@ -91,34 +96,34 @@ entity ZHR_COMP_TBL_CRV_EXPTN_MASTER : cuid, managed {
             100.00
         ] default 0.00;
         merit                    : Decimal(17, 2) default 0.00;
-        merit_Percentage         : Decimal(3, 2) @assert.range: [
+        merit_Percentage         : Decimal(5, 2) @assert.range: [
             0.00,
             100.00
         ] default 0.00;
-        Comment_merit            : String;
+        commentformerit            : String;
         custExceptionCode        : String(200);
         lumpSum                  : Decimal(17, 2) default 0.00;
-        lumpSum_Percentage       : Decimal(3, 2) @assert.range: [
+        lumpSum_Percentage       : Decimal(5, 2) @assert.range: [
             0.00,
             100.00
         ] default 0.00;
         finSalary                : Decimal(17, 2) default 0.00;
-        compaRatio               : Decimal(3, 2) @assert.range: [
+        compaRatio               : Decimal(5, 2) @assert.range: [
             0.00,
             500.00
         ] default 0.00;
         custMeritExcepReqAmt     : Decimal(17, 2) default 0.00;
-        custMeritExcepReqPct     : Decimal(3, 2) @assert.range: [
+        custMeritExcepReqPct     : Decimal(5, 2) @assert.range: [
             0.00,
             200.00
         ] default 0.00;
         custfinSalaryExcepReq    : Decimal(17, 2) default 0.00;
-        custCompaRatioExcepReq   : Decimal(3, 2) @assert.range: [
+        custCompaRatioExcepReq   : Decimal(5, 2) @assert.range: [
             0.00,
             200.00
         ] default 0.00;
         payAdjustmentAmount      : Decimal(17, 2) default 0.00;
-        payAdjustmentAmountPer   : Decimal(3, 2) @assert.range: [
+        payAdjustmentAmountPer   : Decimal(5, 2) @assert.range: [
             0.00,
             200.00
         ] default 0.00;
@@ -130,18 +135,21 @@ entity ZHR_COMP_TBL_CRV_EXPTN_MASTER : cuid, managed {
             'O',
             'S',
             'P'
-        ]; //O - Obselete, A- Approved,S-Save,P-Published
+        ];//O - Obselete, A- Approved,S-Save,P-Published
+        path : String;
+         
 }
 
 // BU Div Master Table
-entity ZHR_COMP_TBL_BUDIV_MASTER : cuid, managed {
+entity ZHR_COMP_TBL_BUDIV_MASTER :  managed {
+    key ID            : UUID;
     key year         : Integer   @assert.range: [
             1000,
             9999
         ];
         custBusUnit  : String(60);
         custDivision : String(60);
-        fieldUsage   : String(1) @asser.range : [
+        fieldUsage   : String(1) @assert.range : [
             'A',
             'O',
             'S'
@@ -149,35 +157,28 @@ entity ZHR_COMP_TBL_BUDIV_MASTER : cuid, managed {
 }
 
 // Target Tabs Master Table
-entity ZHR_COMP_TBL_TARGETTAB_MASTER : cuid, managed {
-    key year          : Integer    @assert.range: [
-            1000,
-            9999
-        ];
-    key Modeltype     : String(10) @assert.range: [
-            'CRV',
-            'STIP',
-            'RSU'
-        ];
-    key TargetTabName : String(80);
-    key custBusUnit   : String(80);
-    key custDivision  : String(80);
-        fieldUsage    : String(1)  @asser.range : [
-            'A',
-            'O',
-            'S'
-        ]; //O - Obselete, A- Active, S-Save
+entity ZHR_COMP_TBL_TARGETTAB_MASTER :  managed {
+  key ID            : UUID;
+  key year          : Integer @assert.range: [1000, 9999];
+  key Modeltype     : String(10) @assert.enum: ['CRV', 'STIP', 'RSU'];
+  key TargetTabName : String(80);
+
+  key custBusUnit   : String(80);
+  key custDivision  : String(80);
+  fieldUsage    : String(1) @assert.enum: ['A', 'O', 'S']; // A - Active, O - Obsolete, S - Save
 }
+
 
 // Update CRV Exception Master Table
 @cds.persistence.skip
-entity ZHR_COMP_TBL_CRV_EXCEP_FINAL : cuid, managed {
+entity ZHR_COMP_TBL_CRV_EXCEP_FINAL :  managed {
+    key ID            : UUID;
     key field_id                 : String;
     key custPERNR                : Integer;
         executiveRuleViolation   : String;
         mgrFirstName             : String;
         mgrLastName              : String;
-        username                 : String;
+        userName                 : String;
         custHireDate             : Date;
         custBusUnit              : String;
         custDivision             : String;
@@ -205,13 +206,16 @@ entity ZHR_COMP_TBL_CRV_EXCEP_FINAL : cuid, managed {
         custCompaRatioExcepReq   : Decimal;
         custMeritExcepReqComment : String;
         salaryNote               : String;
-        PerformanceSubZone       : String;
+        custPerformanceSubZone   : String;
         TargetTabName            : String;
+        path                     : String;
+                
 }
 
 // STIP Exception Master Data
 @cds.persistence.skip
 entity ZHR_COMP_TBL_STIP_EXCEP_MASTER : cuid, managed {
+    key ID            : UUID;
     key field_id                    : String;
         executiveRuleViolation      : String;
         programName                 : String;
@@ -246,6 +250,7 @@ entity ZHR_COMP_TBL_STIP_EXCEP_MASTER : cuid, managed {
 // RSU Exception Master Data
 @cds.persistence.skip
 entity ZHR_COMP_TBL_RSU_EXCEP_MASTER : cuid, managed {
+    key ID            : UUID;
     key field_id                : String;
     key custPERNR               : Integer;
         executiveRuleViolation  : String;
@@ -270,6 +275,7 @@ entity ZHR_COMP_TBL_RSU_EXCEP_MASTER : cuid, managed {
 // STIP Model Header Table
 @cds.persistence.skip
 entity ZHR_COMP_TBL_STIP_MODEL_HEADER : cuid, managed {
+    key ID            : UUID;
     key year        : Integer;
     key model_Id    : String;
     key modelOption : String;
@@ -283,6 +289,7 @@ entity ZHR_COMP_TBL_STIP_MODEL_HEADER : cuid, managed {
 // STIP Model Threshold Table
 @cds.persistence.skip
 entity ZHR_COMP_TBL_STIP_MODEL_ITEM : cuid, managed {
+    key ID            : UUID;
     key year                   : Integer;
     key model_Id               : String;
     key modelOption            : String;
@@ -303,6 +310,7 @@ entity ZHR_COMP_TBL_STIP_MODEL_ITEM : cuid, managed {
 // STIP Model Calibration Table
 @cds.persistence.skip
 entity ZHR_COMP_TBL_STIP_CALIBRATION : cuid, managed {
+    key ID            : UUID;
     key year                 : Integer;
         calibrationName      : String;
         totalBudget          : Decimal;
@@ -321,6 +329,7 @@ entity ZHR_COMP_TBL_STIP_CALIBRATION : cuid, managed {
 // CRV Model Calibration Table
 @cds.persistence.skip
 entity ZHR_COMP_TBL_CRV_CALIBRATION : cuid, managed {
+    key ID            : UUID;
     key year                   : Integer;
         calibrationName        : String;
         totalBudget            : Decimal;
@@ -342,6 +351,7 @@ entity ZHR_COMP_TBL_CRV_CALIBRATION : cuid, managed {
 // RSU Model Calibration Table
 @cds.persistence.skip
 entity ZHR_COMP_TBL_RSU_CALIBRATION : cuid, managed {
+    key ID            : UUID;
     key year             : Integer;
         calibrationName  : String;
         totalBudget      : Decimal;
@@ -359,6 +369,7 @@ entity ZHR_COMP_TBL_RSU_CALIBRATION : cuid, managed {
 // CRV Merit Master Table
 @cds.persistence.skip
 entity ZHR_COMP_TBL_CRV_MERITMASTER : cuid, managed {
+    key ID            : UUID;
     key key1                          : String;
     key key2                          : String;
         compaRatioRanges              : String;
@@ -395,6 +406,7 @@ entity ZHR_COMP_TBL_CRV_MERITMASTER : cuid, managed {
 // STIP MeritMaster Table
 @cds.persistence.skip
 entity ZHR_COMP_TBL_STIP_MERITMASTER : cuid, managed {
+    key ID            : UUID;
     key key1                          : String;
         formulaName                   : String;
         customCriteria0               : String;
@@ -424,6 +436,7 @@ entity ZHR_COMP_TBL_STIP_MERITMASTER : cuid, managed {
 
 // CRV Model Header Table
 entity ZHR_COMP_TBL_CRV_MODEL_HEADER : cuid, managed {
+    key ID            : UUID;
     key year                          : Integer;
     key model_Id                      : String(10);
     //key modelOption                   : String;
@@ -473,7 +486,7 @@ entity ZHR_COMP_TBL_CRV_MODEL_HEADER : cuid, managed {
             0.00,
             100.00
         ] default 0.00;
-        status                        : String(1)     @asser.range  : [
+        status                        : String(1)     @assert.range  : [
             'A',
             'O',
             'S',
@@ -501,6 +514,7 @@ entity ZHR_COMP_TBL_CRV_MODEL_HEADER : cuid, managed {
 
 // CRV Model Threshold Table
 entity ZHR_COMP_TBL_CRV_MODEL_THRSHLD_HEADER : cuid, managed {
+    key ID            : UUID;
     key year                   : Integer @assert.range: [
             1000,
             9999
@@ -515,7 +529,7 @@ entity ZHR_COMP_TBL_CRV_MODEL_THRSHLD_HEADER : cuid, managed {
         totalBudget            : Decimal(17, 2) default 0.00;
         totalCost              : Decimal(17, 2) default 0.00;
         indicator              : String(1);
-        status                        : String(1)     @asser.range  : [
+        status                        : String(1)     @assert.range  : [
             'A',
             'O',
             'S',
@@ -532,6 +546,7 @@ entity ZHR_COMP_TBL_CRV_MODEL_THRSHLD_HEADER : cuid, managed {
 
 // Dynamic Column Value Table
 entity ZHR_COMP_TBL_CRV_MODEL_THRSHLD_ITEM : cuid, managed {
+    key ID            : UUID;
     key year                   : Integer @assert.range: [
             1000,
             9999
@@ -548,11 +563,11 @@ entity ZHR_COMP_TBL_CRV_MODEL_THRSHLD_ITEM : cuid, managed {
         percentage_val_from    : Integer default 0;
         percentage_val_to      : Integer default 0;
         percentage_text        : String(50);
-        fieldUsage             : String(1)     @asser.range  : [
+        fieldUsage             : String(1)     @assert.range  : [
             'D',
             'A'
         ];
-        status                        : String(1)     @asser.range  : [
+        status                        : String(1)     @assert.range  : [
             'A',
             'O',
             'S',
@@ -563,6 +578,7 @@ entity ZHR_COMP_TBL_CRV_MODEL_THRSHLD_ITEM : cuid, managed {
 // Model Master Table
 @cds.persistence.skip
 entity ZHR_COMP_TBL_MODEL_MASTER : cuid, managed {
+    key ID            : UUID;
     key year                 : Integer;
     key model_Id             : String;
     key appType              : String;
