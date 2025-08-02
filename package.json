@@ -28,20 +28,7 @@
     "rimraf": "^5.0.5"
   },
   "scripts": {
-    "start": "cds-serve",
-    "start:hybrid": "cds watch --profile hybrid",
-    "setup:hybrid": "npm run bind:db && npm run bind:uaa && npm run bind:dest",
-    "clean": "rimraf resources mta_archives mta-op* Makefile* gen app/**/dist",
-    "prebuild": "npm run clean",
-    "build": "rimraf resources mta_archives && mbt build --mtar archive",
-    "deploy": "cf deploy mta_archives/archive.mtar --retries 1",
-    "deploy:cf": "npm run build && npm run deploy && npm run clean",
-    "postdeploy": "npm run clean",
-    "undeploy": "cf undeploy ZHR_COMPMODEL_CAP --delete-services --delete-service-keys --delete-service-brokers",
-    "deploy:db": "cds deploy --to hana:ZHR_COMPMODEL_CAP-db",
-    "bind:db": "cds bind db --to ZHR_COMPMODEL_CAP-db",
-    "bind:uaa": "cds bind -2 ZHR_COMPMODEL_CAP-xsuaa-srv",
-    "bind:dest": "cds bind -2 ZHR_COMPMODEL_CAP-destination-service"
+    "start": "cds-serve"
   },
   "cds": {
     "requires": {
@@ -50,6 +37,26 @@
       },
       "[hybrid]": {
         "auth": "mocked"
+      },
+      "db": {
+        "kind": "hana-cloud"
+      },
+      "connectivity": true,
+      "destinations": true,
+      "application-logging": true
+    },
+    "sql": {
+      "native_hana_associations": false
+    },
+    "server": {
+      "body_parser": {
+        "limit": "20mb"
+      }
+    },
+    "query": {
+      "limit": {
+        "default": 15000,
+        "max": 15000
       }
     }
   }
