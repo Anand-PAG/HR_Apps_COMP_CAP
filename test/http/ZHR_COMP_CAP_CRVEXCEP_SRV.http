@@ -7,19 +7,57 @@ GET {{svc}}/$metadata
 ### ## THRSHLD Get
 GET {{svc}}/BusinessDivisions
 
-### ## ZHR_COMP_CAP_CRVEXCEP_SRV Draft POST
-POST {{svc}}/BusinessDivisions
+### Targettab get
+GET {{svc}}/TargetTabs
+
+### Target Tabs Update
+PUT {{svc}}/TargetTabs(ID='41fb91b9-4c2a-41f3-8b25-74d936abf711',year=2025,Modeltype='CRV',TargetTabName='Target1')
 Content-Type: application/json
 
 {
-    "year" : 2025,
-    "custBusUnit" : "123",
-    "custDivision":"213"
+  "custBusUnit": "Business12",
+  "custDivision": "Division12",
+  "fieldUsage": "S"
+}
+
+
+
+
+### ## ZHR_COMP_CAP_CRVEXCEP_SRV Draft POST
+POST {{svc}}/insertMultipleBusinessDivisions
+Content-Type: application/json
+
+{ 
+  "entries": [
+  { "year": 2025, "custBusUnit": "Transmission & Distribution", "custDivision": "NextGen", "fieldUsage": "S" },
+  { "year": 2025, "custBusUnit": "Transmission & Distribution", "custDivision": "Veg, Inspection & Contractor Operations" , "fieldUsage": "S"},
+  { "year": 2025, "custBusUnit": "Transmission & Distribution", "custDivision": "Veg, Inspection & Contractor Operations", "fieldUsage": "S" },
+  { "year": 2025, "custBusUnit": "Transmission & Distribution", "custDivision": "Veg, Inspection & Contractor Operations" ,"fieldUsage": "S"},
+  { "year": 2025, "custBusUnit": "Transmission & Distribution", "custDivision": "Veg, Inspection & Contractor Operations", "fieldUsage": "S" },
+  
+  { "year": 2025, "custBusUnit": "Operational Services", "custDivision": "Transportation Services" ,"fieldUsage": "S"},
+  { "year": 2025, "custBusUnit": "Operational Services", "custDivision": "Transportation Services","fieldUsage": "S" },
+  { "year": 2025, "custBusUnit": "Operational Services", "custDivision": "Transportation Services","fieldUsage": "S" },
+  { "year": 2025, "custBusUnit": "Operational Services", "custDivision": "Transportation Services","fieldUsage": "S" },
+  { "year": 2025, "custBusUnit": "Operational Services", "custDivision": "Transportation Services" ,"fieldUsage": "S"},
+  { "year": 2025, "custBusUnit": "Operational Services", "custDivision": "Transportation Services","fieldUsage": "S" },
+  { "year": 2025, "custBusUnit": "Operational Services", "custDivision": "Transportation Services","fieldUsage": "S" },
+  
+  { "year": 2025, "custBusUnit": "Energy Procurement & Management", "custDivision": "Energy Contract Management","fieldUsage": "S" },
+  { "year": 2025, "custBusUnit": "Energy Procurement & Management", "custDivision": "Energy Contract Management","fieldUsage": "S" },
+  { "year": 2025, "custBusUnit": "Energy Procurement & Management", "custDivision": "Energy Contract Management","fieldUsage": "S" },
+  { "year": 2025, "custBusUnit": "Energy Procurement & Management", "custDivision": "Energy Contract Management" ,"fieldUsage": "S"},
+  { "year": 2025, "custBusUnit": "Energy Procurement & Management", "custDivision": "Energy Contract Management","fieldUsage": "S" },
+  { "year": 2025, "custBusUnit": "Energy Procurement & Management", "custDivision": "Energy Contract Management","fieldUsage": "S" },
+  { "year": 2025, "custBusUnit": "Energy Procurement & Management", "custDivision": "Energy Contract Management" ,"fieldUsage": "S"}
+]
+
+  
 }
 
 ### ## ZHR_COMP_CAP_CRVEXCEP_SRV DELETE
 
-DELETE {{svc}}/BusinessDivisions(ID='fc4fa62b-7bc2-44e9-94f9-144999269033',year=2025)
+DELETE {{svc}}/BusinessDivisions(ID='465d67d6-23bd-49c3-bb19-da757cbadf4a',year=2025)
 Content-Type: application/json
 
 {
@@ -28,16 +66,161 @@ Content-Type: application/json
     "custDivision":"213"
 }
 
-### ## ZHR_COMP_CAP_CRVEXCEP_SRV Draft POST
-POST {{svc}}/Thresholds
+### insert Multipe values for Thresholds
+POST {{svc}}/insertMultipleThresholds
 Content-Type: application/json
 
 {
-    "year" : 2025,
-    "compaRatioRanges" : "<80%",
-    "startRange":"0",
-    "endRange":"79",
-    "sequence":"10",
-    "fieldUsage":"S"
+  "entries": [
+    {
+      "year": 2024,
+      "compaRatioRanges": "<80%",
+      "startRange": "0",
+      "endRange": "79",
+      "sequence": "10",
+      "fieldUsage": "S"
+    },
+    {
+      "year": 2024,
+      "compaRatioRanges": "80% - <90%",
+      "startRange": "80",
+      "endRange": "89",
+      "sequence": "20",
+      "fieldUsage": "S"
+    }
+  ]
 }
 
+### insert Multipe values for CompensationRatioMaster
+
+POST {{svc}}/insertMultipleCompensationRatioMaster
+Content-Type: application/json
+
+{
+  "entries": [
+    {
+       "year" : "2025",
+        "performanceSubZone" : "6.1",
+        "payzones"           : "6",
+        "compaRatioRanges"   : "<80%",
+        "startRange"         : "79",
+        "endRange"           : null,
+        "performanceRating"  : "E/E",
+        "thresholdFrom"      : "4",
+        "thresholdTo"        : "10",
+        "status"             : "S"
+    },
+    {
+       "year" : "2025",
+        "performanceSubZone" : "6.1",
+        "payzones"           : "6",
+        "compaRatioRanges"   : "80% - <90%",
+        "startRange"         : "80",
+        "endRange"           : "89",
+        "performanceRating"  : "E/E",
+        "thresholdFrom"      : "3",
+        "thresholdTo"        : "9",
+        "status"             : "S"
+    },
+    {
+       "year" : "2025",
+        "performanceSubZone" : "6.1",
+        "payzones"           : "6",
+        "compaRatioRanges"   : "90% - <100%",
+        "startRange"         : "90",
+        "endRange"           : "99",
+        "performanceRating"  : "E/E",
+        "thresholdFrom"      : "4",
+        "thresholdTo"        : "9",
+        "status"             : "S"
+    }
+  ]
+}
+
+### insert Multipe values for Subzones
+
+POST {{svc}}/insertMultipleSubzones
+Content-Type: application/json
+
+{
+  "entries": [
+    {
+      "year": "2024",
+      "performanceSubZone": "6.3",
+      "sequence": "10",
+      "fieldUsage": "S"
+    }
+    
+  ]
+}
+
+
+
+
+### post TargetTabs
+POST {{svc}}/TargetTabs
+Content-Type: application/json
+
+{
+  "year": "2025",
+  "Modeltype": "CRV",
+  "TargetTabName": "Target2",
+  "custBusUnit": "Bus1",
+  "custDivision": "Div2",
+  "fieldUsage": "S"
+}
+
+  
+### POST CRVEXception
+POST {{svc}}/insertMultipleCRVException
+Content-Type: application/json
+
+{
+  "entries": [
+    {
+     "field_id": "ed3542de-331d-4406-a22b-15e13a8a2add",
+      "custPERNR": "125338",
+      "executiveRuleViolation": "S",
+      "mgrFirstName": "Navniel",
+      "mgrLastName": "Pillay",
+      "userName": "Gabriella Loza",
+      "custHireDate": "2021-09-27",
+      "custBusUnit": "Customer Service",
+      "custDivision": "Customer Service Operations Division",
+      "custDepartment": "IDSM/CARE/MBL",
+      "jobTitle": "Tech Docmatn Cntrl, Spec",
+      "custPayGradeLevel": 10,
+      "custTargetTab": "",
+      "curSalary": 73199.98,
+      "custCurHrlySalary": 35.1923,
+      "payGuideMid": 95160,
+      "curRatio": 76.92,
+      "custPerformanceZone": "6",
+      "custPDScore": "C+/E",
+      "compaRatioRanges": "",
+      "meritGuideline": 4,
+      "merit": 7320,
+      "merit_Percentage": 10,
+      "commentformerit": "Aracely Diez commented on February 19, 2025 11:44 PM: Low CR",
+      "custExceptionCode": "A2:Incr > Model - Explain",
+      "lumpSum": 0,
+      "lumpSum_Percentage": 0,
+      "finSalary": 80519.98,
+      "compaRatio": 84.62,
+      "custMeritExcepReqAmt": 0,
+      "custMeritExcepReqPct": 0,
+      "custfinSalaryExcepReq": 73199.98,
+      "custCompaRatioExcepReq": 76.92,
+      "custMeritExcepReqComment": "",
+      "salaryNote": "",
+      "payAdjustmentAmount": 0,
+      "payAdjustmentAmountPer": 0,
+      "payAdjustmentFinalPay": 0,
+      "status": "S"
+    }
+  ]
+}
+
+### GET CRVException
+GET {{svc}}/CRVException?$filter=path eq '/FEED/DOWNLOAD/WFA/Compensation_Data_Modeling/CRVExceptionListSF/'
+Content-Type: application/json
