@@ -15,13 +15,12 @@ modules:
     type: nodejs
     path: gen/srv
     parameters:
-      instances: 1
       buildpack: nodejs_buildpack
       readiness-health-check-type: http
       readiness-health-check-http-endpoint: /health
       memory: 2048M
     build-parameters:
-      builder: npm-ci
+      builder: npm
       ignore:
         - node_modules/
     provides:
@@ -61,8 +60,6 @@ resources:
     parameters:
       service: destination
       service-plan: lite
-    requires:
-      - name: srv-api
   - name: ZHR_COMPMODEL_CAP-auth
     type: org.cloudfoundry.managed-service
     parameters:
