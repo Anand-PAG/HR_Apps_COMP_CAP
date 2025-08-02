@@ -57,7 +57,7 @@ entity ZHR_COMP_TBL_COMPRATIO_MASTER :  managed {
         performanceRating  : String(50); //Performance Rating C,C++
         thresholdFrom      : Decimal(5, 2) default 0.00;
         thresholdTo        : Decimal(5, 2) default 0.00;
-        status             : String(1) @assert.enum : [
+        status             : String(1) @assert.range : [
             'A',
             'O',
             'S'

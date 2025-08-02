@@ -27,12 +27,12 @@ class ZHR_COMP_CAP_CRVEXCEP_SRV extends cds.ApplicationService {
       const where = req.query.SELECT?.where;
       const filterPath = extractPathFromWhere(where);
       console.log("Extracted filter path:", filterPath);
-
-
-
+    
       if (!filterPath) {
         return req.reject(400, 'Missing path query parameter');
       }
+
+     
 
       console.log('Requested path:', filterPath);
       const sftp = new Sftpclient();
@@ -236,15 +236,15 @@ status: 'S', // or infer from file if available
         return req.error(400, 'Each entry must have both field_id and custPERNR');
       }
     
-      try {
-        // Step 1: Delete all existing records
-        await DELETE.from(this.entities.CRVException);
-        console.log('🗑️ Existing CRVException records deleted.');
+      // try {
+      //   // Step 1: Delete all existing records
+      //   await DELETE.from(this.entities.CRVException);
+      //   console.log('🗑️ Existing CRVException records deleted.');
     
-      } catch (deleteErr) {
-        console.error('❌ Delete failed:', deleteErr);
-        return req.error(500, `Delete failed: ${deleteErr.message}`);
-      }
+      // } catch (deleteErr) {
+      //   console.error('❌ Delete failed:', deleteErr);
+      //   return req.error(500, `Delete failed: ${deleteErr.message}`);
+      // }
     
       try {
         // Step 2: Insert new records
@@ -261,7 +261,17 @@ status: 'S', // or infer from file if available
     });
     
 
-
+    this.on('clearCRVExceptions', async (req) => {
+      try {
+        await DELETE.from(this.entities.CRVException);
+        console.log('🗑️ All CRVException records deleted.');
+        return req.reply({ message: 'All CRVException records deleted successfully.' });
+      } catch (err) {
+        console.error('❌ Deletion failed:', err);
+        return req.error(500, `Deletion failed: ${err.message}`);
+      }
+    });
+    
     this.on('READ', 'BusinessDivisions', async (req) => {
       return await SELECT.from(BusinessDivisions);
     });
@@ -302,6 +312,7 @@ status: 'S', // or infer from file if available
       }
 
       try {
+        await DELETE.from(this.entities.BusinessDivisions);
         await INSERT.into(this.entities.BusinessDivisions).entries(entries);
         return req.reply({ message: `${entries.length} BusinessDivisions records inserted.` });
       } catch (error) {
@@ -341,6 +352,7 @@ status: 'S', // or infer from file if available
       }
 
       try {
+        await DELETE.from(this.entities.Thresholds);
         await INSERT.into(this.entities.Thresholds).entries(entries);
         return req.reply({ message: `${entries.length} Threshold records inserted.` });
       } catch (error) {
@@ -378,6 +390,7 @@ status: 'S', // or infer from file if available
       }
 
       try {
+        await DELETE.from(this.entities.SubZones);
         await INSERT.into(this.entities.SubZones).entries(entries);
         return req.reply({ message: `${entries.length} Subzone records inserted.` });
       } catch (error) {
@@ -415,6 +428,7 @@ status: 'S', // or infer from file if available
       }
 
       try {
+        await DELETE.from(this.entities.CompensationRatioMaster);
         await INSERT.into(this.entities.CompensationRatioMaster).entries(entries);
         return req.reply({ message: `${entries.length} CompensationRatio records inserted.` });
       } catch (error) {
@@ -423,10 +437,10 @@ status: 'S', // or infer from file if available
       }
     });
 
-
-    // this.on('READ', 'CompensationRatioMaster', async (req) => {
-    //   return await SELECT.from(CompensationRatioMaster);
-    // });
+    this.on('readCompensationRatioMaster', async () => {
+      return await SELECT.from(this.entities.CompensationRatioMaster);
+    });
+    
 
     this.on('POST', 'TargetTabs', async (req) => {
       try {
@@ -465,34 +479,7 @@ status: 'S', // or infer from file if available
       }
     });
 
-    // this.on('PUT', 'TargetTabs', async (req) => {
-    //   try {
-    //     const { ID, year, Modeltype, TargetTabName, custBusUnit, custDivision, fieldUsage } = req.data;
-    
-    //     if (!ID) {
-    //       req.error(400, 'Missing primary key: ID');
-    //     }
-    
-    //     // Replace the entire entry with new data
-    //     await UPDATE(TargetTabs)
-    //       .set({
-    //         year,
-    //         Modeltype,
-    //         TargetTabName,
-    //         custBusUnit,
-    //         custDivision,
-    //         fieldUsage
-    //       })
-    //       .where({ ID });
-    
-    //     return req.data;
-    
-    //   } catch (error) {
-    //     console.error('PUT update failed:', error);
-    //     req.error(500, 'PUT update failed');
-    //   }
-    // });
-
+  
     this.before('UPDATE', 'TargetTabs', (req) => {
       if (req.data.fieldUsage && !['A', 'O', 'S'].includes(req.data.fieldUsage)) {
         req.reject(400, 'Invalid fieldUsage value');
