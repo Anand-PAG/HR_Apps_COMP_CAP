@@ -221,6 +221,12 @@ Content-Type: application/json
   ]
 }
 
+
 ### GET CRVException
 GET {{svc}}/CRVException?$filter=path eq '/FEED/DOWNLOAD/WFA/Compensation_Data_Modeling/CRVExceptionListSF/'
 Content-Type: application/json
+ 
+
+### READ from DB
+GET http://localhost:4004/odata/v4/zhr-comp-cap-crvexcep-srv/readCompensationRatioMaster
+

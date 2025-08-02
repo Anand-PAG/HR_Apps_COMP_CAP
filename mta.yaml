@@ -39,6 +39,9 @@ modules:
     path: gen/db
     parameters:
       buildpack: nodejs_buildpack
+      readiness-health-check-type: http
+      readiness-health-check-http-endpoint: /health
+      memory: 2048M
     build-parameters:
       ignore:
         - node_modules/

@@ -102,7 +102,12 @@ service ZHR_COMP_CAP_CRVEXCEP_SRV {
     action insertMultipleBusinessDivisions(entries: array of BusinessDivisionInput);
     action insertMultipleCRVException(entries: array of CRVExceptionInput);
     action insertMultipleTargetTabs(entries: array of TargetTabsInput);
+    action clearCRVExceptions();
 
+    function readCompensationRatioMaster() returns array of CompensationRatioMaster;
+
+
+    
 
 
 
