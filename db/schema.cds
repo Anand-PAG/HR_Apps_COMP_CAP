@@ -44,7 +44,7 @@ entity ZHR_COMP_TBL_SUBZONE_MASTER :  managed {
 
 // Comp Master Table
 entity ZHR_COMP_TBL_COMPRATIO_MASTER :  managed {
-    key ID            : UUID;
+       key ID            : UUID;
     key year               : Integer   @assert.range: [
             1000,
             9999
@@ -167,6 +167,26 @@ entity ZHR_COMP_TBL_TARGETTAB_MASTER :  managed {
   key custDivision  : String(80);
   fieldUsage    : String(1) @assert.enum: ['A', 'O', 'S']; // A - Active, O - Obsolete, S - Save
 }
+
+entity ZHR_COMP_TBL_TARGETTABS_MASTER : managed {
+  key year             : Integer @assert.range: [1000, 9999];
+  key ID               : UUID;
+  key TargetTabName    : String(40);
+  key Modeltype        : String(10);
+  custBusUnit          : String(80);
+  changedStatus        : String(1);
+  fieldUsage    : String(1) @assert.range: ['A', 'O', 'S'];
+}
+ 
+entity ZHR_COMP_TBL_BUDIV_GROUP {
+  key year          : Integer @assert.range: [1000, 9999];
+  key ID            : UUID;
+  key Modeltype     : String(10);
+  custBusUnit       : String(80);
+  custDivision      : String(80);
+  TargetTabName     : String(40);
+}
+
 
 
 // Update CRV Exception Master Table
