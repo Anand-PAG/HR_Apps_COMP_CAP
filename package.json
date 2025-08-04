@@ -10,6 +10,7 @@
     "@sap/cds": "^9",
     "@sap/xsenv": "^5.6.1",
     "@sap/xssec": "^4",
+    "cds-swagger-ui-express": "^0.10.0",
     "csv-parser": "^3.2.0",
     "express": "^4",
     "fs": "^0.0.1-security",
@@ -50,13 +51,13 @@
     },
     "server": {
       "body_parser": {
-        "limit": "20mb"
+        "limit": "20000mb"
       }
     },
     "query": {
       "limit": {
-        "default": 15000,
-        "max": 15000
+        "default": 1500000,
+        "max": 1500000
       }
     }
   }
