@@ -126,10 +126,11 @@ service ZHR_COMP_CAP_CRVEXCEP_SRV {
     action   insertMultipleCRVException(entries : array of CRVExceptionInput);
     action   insertMultipleTargetTabs(entries : array of TargetTabsInput);
     action   clearCRVExceptions(indicator:String);
-    action   createupsertTargetTabs(target:CompTargets);
+    action   createupsertTargetTabs(nestedpayload:CompTargets);
 
     function readCompensationRatioMaster() returns array of CompensationRatioMaster;
     function readTargets( year:yearfilter ) returns array of CompTargets;
+    function readCRVExceptionMaster() returns array of CRVException;
 
 
 //entity CRV_EXCEP_FINAL as projection on compmodel.ZHR_COMP_TBL_CRV_EXCEP_FINAL;

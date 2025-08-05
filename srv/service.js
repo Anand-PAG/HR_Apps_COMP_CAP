@@ -6,13 +6,10 @@ const fs = require('fs');
 
 
 class ZHR_COMP_CAP_CRVEXCEP_SRV extends cds.ApplicationService {
-  
+
   async init() {
-    this.on('bootstrap', app => {
-      const bodyParser = require('body-parser');
-      app.use(bodyParser.json({ limit: '50mb' }));
-    });
-    const { BusinessDivisions, TargetTabs, Thresholds, SubZones, CompensationRatioMaster, CRVException } = this.entities;
+
+    const { BusinessDivisions, CRVTargets, CRVDivisions, Thresholds, SubZones, CompensationRatioMaster, CRVException } = this.entities;
 
     function extractPathFromWhere(where) {
       if (!where) return null;
@@ -27,12 +24,12 @@ class ZHR_COMP_CAP_CRVEXCEP_SRV extends cds.ApplicationService {
       const where = req.query.SELECT?.where;
       const filterPath = extractPathFromWhere(where);
       console.log("Extracted filter path:", filterPath);
-    
+
       if (!filterPath) {
         return req.reject(400, 'Missing path query parameter');
       }
 
-     
+
 
       console.log('Requested path:', filterPath);
       const sftp = new Sftpclient();
@@ -100,6 +97,8 @@ class ZHR_COMP_CAP_CRVEXCEP_SRV extends cds.ApplicationService {
       } catch (err) {
         console.error('SFTP Error:', err.message);
         return req.error(500, 'Failed to read SFTP file');
+      } finally {
+        sftp.end();
       }
     });
 
@@ -141,7 +140,7 @@ class ZHR_COMP_CAP_CRVEXCEP_SRV extends cds.ApplicationService {
         const workbook = XLSX.read(fileBuffer, { type: 'buffer', raw: true });
         const allData = [];
 
-          for (const sheetName of workbook.SheetNames) {
+        for (const sheetName of workbook.SheetNames) {
           const sheet = workbook.Sheets[sheetName];
           const rows = XLSX.utils.sheet_to_json(sheet, { header: 1 });
           //console.log("this is rows");
@@ -151,7 +150,7 @@ class ZHR_COMP_CAP_CRVEXCEP_SRV extends cds.ApplicationService {
 
           const headers = rows[1]; // 2nd row = field IDs
           const dataRows = rows.slice(2); // actual data
-            console.log(dataRows);
+          console.log(dataRows);
           for (const row of dataRows) {
             const entry = {};
             headers.forEach((key, idx) => {
@@ -160,7 +159,7 @@ class ZHR_COMP_CAP_CRVEXCEP_SRV extends cds.ApplicationService {
             allData.push(entry);
           }
         }
-        console.log("allData",allData);
+        console.log("allData", allData);
         //const Percentage = "%merit";
         //console.log("#####",Percentage.valueOf());
         const finalData = allData.map((r) => ({
@@ -200,11 +199,11 @@ class ZHR_COMP_CAP_CRVEXCEP_SRV extends cds.ApplicationService {
           custMeritExcepReqComment: r.custMeritExcepReqComment || '',
           salaryNote: r.salaryNote || '',
           custTargetTab: r.custTargetTab || '',
-compaRatioRanges: r.compaRatioRanges || '',
-payAdjustmentAmount: parseFloat(r.payAdjustmentAmount) || 0,
-payAdjustmentAmountPer: parseFloat(r.payAdjustmentAmountPer) || 0,
-payAdjustmentFinalPay: parseFloat(r.payAdjustmentFinalPay) || 0,
-status: 'S', // or infer from file if available
+          compaRatioRanges: r.compaRatioRanges || '',
+          payAdjustmentAmount: parseFloat(r.payAdjustmentAmount) || 0,
+          payAdjustmentAmountPer: parseFloat(r.payAdjustmentAmountPer) || 0,
+          payAdjustmentFinalPay: parseFloat(r.payAdjustmentFinalPay) || 0,
+          status: 'S', // or infer from file if available
 
 
         })
@@ -215,37 +214,39 @@ status: 'S', // or infer from file if available
       } catch (err) {
         console.error('SFTP Error:', err.message);
         return req.error(500, 'Failed to read SFTP file');
+      } finally {
+        sftp.end();
       }
     });
 
     this.on('insertMultipleCRVException', async (req) => {
       const { entries } = req.data;
-    
+
       if (!Array.isArray(entries) || entries.length === 0) {
         return req.error(400, 'No CRVException entries provided');
       }
-    
+
       // Optional: Log the shape of data
       console.log('🟢 Received entries count:', entries.length);
       console.log('🔍 Sample entry:', JSON.stringify(entries[0], null, 2));
-    
+
       // Validate composite key fields
       const invalidEntry = entries.find(e => !e.field_id || !e.custPERNR);
       if (invalidEntry) {
         console.error('❌ Invalid entry found:', invalidEntry);
         return req.error(400, 'Each entry must have both field_id and custPERNR');
       }
-    
+
       // try {
       //   // Step 1: Delete all existing records
       //   await DELETE.from(this.entities.CRVException);
       //   console.log('🗑️ Existing CRVException records deleted.');
-    
+
       // } catch (deleteErr) {
       //   console.error('❌ Delete failed:', deleteErr);
       //   return req.error(500, `Delete failed: ${deleteErr.message}`);
       // }
-    
+
       try {
         // Step 2: Insert new records
         await INSERT.into(this.entities.CRVException).entries(entries);
@@ -253,13 +254,13 @@ status: 'S', // or infer from file if available
         return req.reply({
           message: `${entries.length} CRVException records inserted successfully after clearing existing ones.`,
         });
-    
+
       } catch (insertErr) {
         console.error('❌ Insert failed:', insertErr);
         return req.error(500, `Insert failed: ${insertErr.message}`);
       }
     });
-    
+
 
     this.on('clearCRVExceptions', async (req) => {
       try {
@@ -271,7 +272,7 @@ status: 'S', // or infer from file if available
         return req.error(500, `Deletion failed: ${err.message}`);
       }
     });
-    
+
     this.on('READ', 'BusinessDivisions', async (req) => {
       return await SELECT.from(BusinessDivisions);
     });
@@ -440,28 +441,8 @@ status: 'S', // or infer from file if available
     this.on('readCompensationRatioMaster', async () => {
       return await SELECT.from(this.entities.CompensationRatioMaster);
     });
-    
 
-    this.on('POST', 'TargetTabs', async (req) => {
-      try {
-        await INSERT.into(TargetTabs).entries({
-          year: req.data.year,
-          Modeltype: req.data.Modeltype,
-          TargetTabName: req.data.TargetTabName,
-          custBusUnit: req.data.custBusUnit,
-          custDivision: req.data.custDivision,
-          fieldUsage: req.data.fieldUsage
-        });
-        return req.data
-      } catch (error) {
-        console.log(error);
-        throw new Error(error);
-      }
-    });
 
-    this.on('READ', 'TargetTabs', async (req) => {
-      return await SELECT.from(TargetTabs);
-    });
 
     this.on('insertMultipleTargetTabs', async (req) => {
       const { entries } = req.data;
@@ -479,14 +460,135 @@ status: 'S', // or infer from file if available
       }
     });
 
-  
-    this.before('UPDATE', 'TargetTabs', (req) => {
-      if (req.data.fieldUsage && !['A', 'O', 'S'].includes(req.data.fieldUsage)) {
-        req.reject(400, 'Invalid fieldUsage value');
+
+    this.on('readTargets', async (req) => {
+      const { year } = req.data;
+
+      const TargetData = await SELECT.from(CRVTargets).where({ year });
+
+      if (TargetData.length === 0) {
+        return [];
       }
+      const TargetIds = TargetData.map(t => t.TargetTabName);
+      const DivisionsData = await SELECT.from(CRVDivisions).where({
+        TargetTabName: { in: TargetIds },
+        year: year
+      });
+      console.log(DivisionsData)
+      const finalresult = TargetData.map(td => ({
+        ID: td.uuid,
+        year: td.year,
+        Modeltype: td.Modeltype,
+        TargetTabName: td.TargetTabName,
+        custBusUnit: td.custBusUnit,
+        changedStatus: td.changedStatus,
+        createdBy: td.createdBy,
+        changedBy: td.changedBy,
+        fieldUsage: td.fieldUsage,
+        to_divisions: DivisionsData.filter(
+          d => d.year === td.year
+            && d.Modeltype === td.Modeltype
+            && d.TargetTabName === td.TargetTabName
+        ).map(d => ({
+          ID: d.uuid,
+          custDivision: d.custDivision
+        }))
+      }));
+      return finalresult;
     });
-    
-    
+
+    this.on('createupsertTargetTabs', async (req) => {
+      const { nestedpayload } = req.data;
+      try {
+        const {
+          ID,
+          year,
+          Modeltype,
+          TargetTabName,
+          custBusUnit,
+          changedStatus,
+          createdBy,
+          changedBy,
+          fieldUsage,
+          to_divisions = []
+        } = nestedpayload;
+
+        if (!year || !Modeltype) {
+          return req.error(400, 'Both year and Modeltype are required.');
+        }
+
+        const existingModel = await SELECT.from(CRVTargets).where({
+          TargetTabName: TargetTabName,
+          year: year,
+          Modeltype: Modeltype
+        });
+        if (existingModel.length > 0) {
+          try {
+            await UPDATE(CRVTargets).set({
+              custBusUnit,
+              changedStatus,
+              fieldUsage,
+            }).where({
+              ID: existingModel[0].ID,
+              year,
+              Modeltype,
+              TargetTabName,
+            });
+            try {
+              await DELETE.from(CRVDivisions).where({ year, Modeltype, TargetTabName });
+              for (const div of to_divisions) {
+                try {
+                  for (const div of to_divisions) {
+                    await INSERT.into(CRVDivisions).entries({
+                      year,
+                      Modeltype,
+                      TargetTabName,
+                      custBusUnit,
+                      custDivision: div.custDivision
+                    });
+                  }
+                  return 'Target Tab Updated Successfully'
+                } catch (error) {
+                  return req.error(500, `Divisions failed: ${error.message}`);
+                }
+
+              }
+            } catch {
+              return req.error(500, `Create failed: ${error.message}`);
+            }
+          } catch (error) {
+            return req.error(500, `Create failed: ${error.message}`);
+          }
+        } else {
+          console.log('no data found');
+          await INSERT.into(CRVTargets).entries({
+            year,
+            Modeltype,
+            TargetTabName,
+            custBusUnit,
+            changedStatus,
+            fieldUsage,
+          });
+          for (const div of to_divisions) {
+            await INSERT.into(CRVDivisions).entries({
+              year,
+              Modeltype,
+              TargetTabName,
+              custBusUnit,
+              custDivision: div.custDivision
+            });
+          }
+          return 'Target Tab created successfully';
+        }
+      } catch (error) {
+        return req.error(500, `Upsert/Create failed: ${error.message}`);
+      }
+
+    });
+
+    this.on('readCRVExceptionMaster', async () => {
+      return await SELECT.from(this.entities.CRVException);
+    });
 
     return super.init();
   }

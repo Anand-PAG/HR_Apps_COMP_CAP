@@ -230,3 +230,61 @@ Content-Type: application/json
 ### READ from DB
 GET http://localhost:4004/odata/v4/zhr-comp-cap-crvexcep-srv/readCompensationRatioMaster
 
+### READ from DB
+
+GET {{svc}}/readTargets
+Content-Type: application/json
+
+{
+  "year": 2025
+}
+
+###POST TARGET Tabs
+POST {{svc}}/CRVTargets
+Content-Type: application/json
+
+{
+  "year":2025,
+  "TargetTabName":"Target1",
+  "Modeltype":"CRV",
+  "custBusUnit":"Business4",
+  "changedStatus":"X",
+  "fieldUsage":"A"
+}
+
+### POST Divisions
+
+POST {{svc}}/CRVDivisions 
+Content-Type: application/json
+
+{
+  "year":2025,
+  "TargetTabName":"Target1",
+  "Modeltype":"CRV",
+  "custBusUnit":"Business4",
+  "custDivision":"Division6"
+}
+
+### Post Targets
+
+POST {{svc}}/createupsertTargetTabs
+Content-Type: application/json
+
+{
+  "nestedpayload": {
+      "year": 2025,
+      "Modeltype": "CRV",
+      "TargetTabName": "Target10",
+      "custBusUnit": "Business50",
+      "changedStatus": "X",
+      "fieldUsage": "A",
+      "to_divisions": [
+        {
+          "custDivision": "Division50"
+        },
+        {
+          "custDivision": "Division11"
+        }
+      ]
+  }
+}
