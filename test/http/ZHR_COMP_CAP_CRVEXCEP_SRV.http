@@ -10,6 +10,13 @@ GET {{svc}}/BusinessDivisions
 ### Targettab get
 GET {{svc}}/TargetTabs
 
+### persona get
+POST /odata/v4/zhr-comp-cap-crvexcep-srv/Persona
+Content-Type: application/json
+
+{ "user_email": "alice@example.com", "role": "approver" }
+
+
 ### Target Tabs Update
 PUT {{svc}}/TargetTabs(ID='41fb91b9-4c2a-41f3-8b25-74d936abf711',year=2025,Modeltype='CRV',TargetTabName='Target1')
 Content-Type: application/json
@@ -19,7 +26,6 @@ Content-Type: application/json
   "custDivision": "Division12",
   "fieldUsage": "S"
 }
-
 
 
 
@@ -237,6 +243,77 @@ Content-Type: application/json
 
 {
   "year": 2025
+}
+
+### READ from Totals
+
+GET {{svc}}/readTargetTotal
+Content-Type: application/json
+
+{ 
+  "year" : 2025,
+  "TargetTabName" : "Target-3"
+}
+
+### Post Number Range
+
+POST {{svc}}/createnumberRange
+Content-Type: application/json
+
+{ 
+  "Modeltype" : "CRV",
+  "year" : 2025
+  
+}
+
+### READ CRV Model
+GET {{svc}}/crvModelsLaunch?$filter= year eq 2025
+Content-Type: application/json
+
+### READ CRV Approved by
+GET {{svc}}/readApprovedby
+Content-Type: application/json
+
+### READ CRV Created by
+GET {{svc}}/readCreatedby
+Content-Type: application/json
+
+### READ CRV Status
+
+GET {{svc}}/readStatus
+Content-Type: application/json
+
+### READ Targets
+GET {{svc}}/readTargetMaster
+Content-Type: application/json
+
+### POST CRV Model
+POST {{svc}}/crvModelsLaunch
+Content-Type: application/json
+
+{
+  "year" : 2025,
+  "model_Id" : "HR001",
+  "targetTab": "TargetTab1",
+  "modelOption":"3",
+  "totalsalary":"3000003",
+  "pool":"100034",
+  "pool_available":"3000045",
+  "totalDistributed":"300000",
+  "totalDistrubuted_Percentage":"2",
+  "remainingPool":"2343425",
+  "remainingPool_Percentage":"2",
+  "remainingPoolbalance":"100000",
+  "createdname":"venkata Gedala",
+  "approvedby" : "saiprasoona.moolpuru@sce.com",
+  "approvedon" : "2025-08-07",
+  "approvedname": "Sai Prasoona",
+  "approvedcomments":"Approved the Model 3",
+  "publishedon":"2025-08-08",
+  "publishedname": "Raghu Nimmalapudi",
+  "publishedby":"raghuram.nimmalapudi@sce.com",
+  "publishedcomments": "Published the Model 3",
+  "status": "P"
 }
 
 ###POST TARGET Tabs

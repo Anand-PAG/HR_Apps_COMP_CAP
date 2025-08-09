@@ -9,7 +9,7 @@ class ZHR_COMP_CAP_CRVEXCEP_SRV extends cds.ApplicationService {
 
   async init() {
 
-    const { BusinessDivisions, CRVTargets, CRVDivisions, Thresholds, SubZones, CompensationRatioMaster, CRVException } = this.entities;
+    const { BusinessDivisions, CRVTargets, CRVDivisions, Thresholds, SubZones, CompensationRatioMaster, CRVException, crvModelsLaunch, NumberRange } = this.entities;
 
     function extractPathFromWhere(where) {
       if (!where) return null;
@@ -227,36 +227,36 @@ class ZHR_COMP_CAP_CRVEXCEP_SRV extends cds.ApplicationService {
       }
 
       // Optional: Log the shape of data
-      console.log('🟢 Received entries count:', entries.length);
-      console.log('🔍 Sample entry:', JSON.stringify(entries[0], null, 2));
+      console.log(' Received entries count:', entries.length);
+      console.log(' Sample entry:', JSON.stringify(entries[0], null, 2));
 
       // Validate composite key fields
       const invalidEntry = entries.find(e => !e.field_id || !e.custPERNR);
       if (invalidEntry) {
-        console.error('❌ Invalid entry found:', invalidEntry);
+        console.error('Invalid entry found:', invalidEntry);
         return req.error(400, 'Each entry must have both field_id and custPERNR');
       }
 
       // try {
       //   // Step 1: Delete all existing records
       //   await DELETE.from(this.entities.CRVException);
-      //   console.log('🗑️ Existing CRVException records deleted.');
+      //   console.log('Existing CRVException records deleted.');
 
       // } catch (deleteErr) {
-      //   console.error('❌ Delete failed:', deleteErr);
+      //   console.error(' Delete failed:', deleteErr);
       //   return req.error(500, `Delete failed: ${deleteErr.message}`);
       // }
 
       try {
         // Step 2: Insert new records
         await INSERT.into(this.entities.CRVException).entries(entries);
-        console.log(`✅ ${entries.length} CRVException records inserted successfully.`);
+        console.log(` ${entries.length} CRVException records inserted successfully.`);
         return req.reply({
           message: `${entries.length} CRVException records inserted successfully after clearing existing ones.`,
         });
 
       } catch (insertErr) {
-        console.error('❌ Insert failed:', insertErr);
+        console.error(' Insert failed:', insertErr);
         return req.error(500, `Insert failed: ${insertErr.message}`);
       }
     });
@@ -265,10 +265,10 @@ class ZHR_COMP_CAP_CRVEXCEP_SRV extends cds.ApplicationService {
     this.on('clearCRVExceptions', async (req) => {
       try {
         await DELETE.from(this.entities.CRVException);
-        console.log('🗑️ All CRVException records deleted.');
+        console.log(' All CRVException records deleted.');
         return req.reply({ message: 'All CRVException records deleted successfully.' });
       } catch (err) {
-        console.error('❌ Deletion failed:', err);
+        console.error(' Deletion failed:', err);
         return req.error(500, `Deletion failed: ${err.message}`);
       }
     });
@@ -483,7 +483,7 @@ class ZHR_COMP_CAP_CRVEXCEP_SRV extends cds.ApplicationService {
         custBusUnit: td.custBusUnit,
         changedStatus: td.changedStatus,
         createdBy: td.createdBy,
-        changedBy: td.changedBy,
+        modifiedBy: td.modifiedBy,
         fieldUsage: td.fieldUsage,
         to_divisions: DivisionsData.filter(
           d => d.year === td.year
@@ -495,6 +495,30 @@ class ZHR_COMP_CAP_CRVEXCEP_SRV extends cds.ApplicationService {
         }))
       }));
       return finalresult;
+    });
+
+    this.on('readTargetTotal', async (req) => {
+      const { year, TargetTabName } = req.data;
+      const TargetData = await SELECT.from(CRVTargets).where({ year: year,Modeltype: 'CRV',TargetTabName: TargetTabName});
+      const Divisions = await SELECT.from(CRVDivisions).where({
+        TargetTabName: TargetTabName,
+        Modeltype: 'CRV',
+        year: year
+      });
+      var businessUnit = TargetData[0].custBusUnit;
+      const aDivisions = Divisions.map(d => d.custDivision);
+      const aExceptionData = await SELECT.from(CRVException)
+      .columns(
+        'custBusUnit',
+        'sum(curSalary) as totalSalary'
+      ).where({
+        custBusUnit: businessUnit,
+        custDivision: { in: aDivisions }
+      }).groupBy('custBusUnit');
+      console.log(aExceptionData);
+
+      const aFinal = { year : year, TargetTabName: TargetTabName, curSalary : aExceptionData[0]?.totalSalary ?? 0.00}
+      return aFinal;
     });
 
     this.on('createupsertTargetTabs', async (req) => {
@@ -586,8 +610,150 @@ class ZHR_COMP_CAP_CRVEXCEP_SRV extends cds.ApplicationService {
 
     });
 
+  this.on('deleteTargetTab', async (req) => {
+    const p = (req.data && (req.data.nestedpayload || req.data)) || {};
+    const { year, Modeltype, TargetTabName, custBusUnit } = p;
+
+    if (!year || !Modeltype || !TargetTabName || !custBusUnit) {
+      return req.error(400, 'year, Modeltype, TargetTabName, custBusUnit are required');
+    }
+
+    const tx = cds.transaction(req);
+
+    try {
+      // find the header by natural key (your projection names)
+      const header = await tx.run(
+        SELECT.one.from(CRVTargets).where({ year, Modeltype, TargetTabName, custBusUnit })
+      );
+
+      if (!header) return true; 
+
+      // delete children first (or rely on FK cascade if you’ve set it)
+      await tx.run(
+        DELETE.from(CRVDivisions).where({ year, Modeltype, TargetTabName, custBusUnit })
+      );
+
+      // delete header
+      await tx.run(DELETE.from(CRVTargets).where({ ID: header.ID }));
+
+      return true;
+    } catch (err) {
+      return req.error(500, `deleteTargetTab failed: ${err.message}`);
+    }
+  });
+
+
+
     this.on('readCRVExceptionMaster', async () => {
       return await SELECT.from(this.entities.CRVException);
+    });
+
+    this.on('readStatus', async () => {
+      var sStatus = [];
+      sStatus.push({
+        StatusCode: 'S',
+        StatusDescription: 'Submitted'
+      }, {
+        StatusCode: 'O',
+        StatusDescription: 'Obsolete'
+      }, {
+        StatusCode: 'P',
+        StatusDescription: 'Published'
+      }, {
+        StatusCode: 'A',
+        StatusDescription: 'Approved'
+      }, {
+        StatusCode: 'R',
+        StatusDescription: 'Rejected'
+      });
+      return sStatus;
+    });
+
+    this.on('readTargetMaster', async () => {
+      const Targets = await SELECT.from(CRVTargets);
+      var targetdata = [];
+      const seen = new Set();
+      Targets.forEach(entry => {
+        const key = `${entry.TargetTabName}`;
+        if (!seen.has(key)) {
+          seen.add(key);
+          targetdata.push(entry.TargetTabName);
+        }
+      });
+      return targetdata;
+    });
+
+    this.on('readApprovedby', async() => {
+      const ApprovedData = await SELECT.from(crvModelsLaunch).columns('approvedby', 'approvedname' );
+      var Approvedby = [];
+      const seen = new Set();
+      ApprovedData.forEach(entry => {
+        const key = `${entry.approvedby}`;
+        if (!seen.has(key)) {
+          seen.add(key);
+          Approvedby.push({approvedby:entry.approvedby,approvedname:entry.approvedname});
+        }
+      });
+      return Approvedby;
+    });
+
+    this.on('readCreatedby', async() => {
+      const CreatedData = await SELECT.from(crvModelsLaunch).columns('createdBy', 'createdname' );
+      var Createdby = [];
+      const seen = new Set();
+      CreatedData.forEach(entry => {
+        const key = `${entry.createdBy}`;
+        if (!seen.has(key)) {
+          seen.add(key);
+          Createdby.push({createdBy:entry.createdBy,createdname:entry.createdname});
+        }
+      });
+      return Createdby;
+    });
+
+    this.on('createnumberRange', async(req) => { 
+      const { year, Modeltype } = req.data;
+      console.log(year);
+      console.log(Modeltype);
+      function padToLength4(value) {
+        return String(value || "").padStart(4, "0");
+      }
+      const aNumbers = await SELECT.from(NumberRange).where({
+        year: year,
+        Modeltype: Modeltype
+      });
+      console.log(aNumbers);
+      if (aNumbers.length > 0){
+        if(aNumbers[0].status === 'D'){
+          var Id = 'CM' + year.toString() + padToLength4(aNumbers[0].currentvalue);
+          var ModelId = { ModelId: Id }
+          return ModelId;
+        }else{
+          var next = 0;
+          next = aNumbers[0].currentvalue + 1;
+          var Id = 'CM' + year.toString() + padToLength4(next);
+          var ModelId = { ModelId: Id }
+          return ModelId;
+        }
+      }else{
+        try {
+          console.log('else satisfied');
+          await INSERT.into(NumberRange).entries({
+            year: year,
+            Modeltype: Modeltype,
+            rangefrom: 1,
+            rangeto: 9999,
+            currentvalue: 1,
+            status: 'D'
+          });
+          var Id = 'CM' + year.toString() + padToLength4(1);
+          var ModelId = { ModelId: Id }
+          return ModelId;
+        } catch (error) {
+          return 'N/A'
+        }
+        
+      }
     });
 
     return super.init();
