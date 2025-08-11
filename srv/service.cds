@@ -89,25 +89,124 @@ type TargetTabsInput        : {
 }
 
 type CompTargets {
-        ID            : UUID;
-        year          : Integer;
-        Modeltype     : String(10);
-        TargetTabName : String(40);
-        custBusUnit   : String(80);
-        changedStatus : String(1);
-        createdBy     : String;
-        changedBy     : String;
-        fieldUsage    : String(1);
+    ID            : UUID;
+    year          : Integer;
+    Modeltype     : String(10);
+    TargetTabName : String(40);
+    curSalary     : Decimal(17, 2);
+    custBusUnit   : String(80);
+    changedStatus : String(1);
+    createdBy     : String;
+    changedBy     : String;
+    fieldUsage    : String(1);
 
-        to_divisions  : many Divisionstype;
+    to_divisions  : many Divisionstype;
 }
+
+type targetTotals {
+    year          : Integer;
+    TargetTabName : String(40);
+    curSalary     : Decimal(17, 2);
+}
+
+//Raghu added this code
+type DeleteTargetTabInput   : {
+    year          : Integer;
+    Modeltype     : String(10);
+    TargetTabName : String(80);
+    custBusUnit   : String(80);
+}
+
 
 type Divisionstype {
-        ID           : UUID;
-        custDivision : String(80);
+    ID           : UUID;
+    custDivision : String(80);
 }
 
-type yearfilter : Integer;
+type ModelStatus {
+    StatusCode        : String(1);
+    StatusDescription : String;
+}
+
+type ApprovedData {
+    approvedby   : String;
+    approvedname : String;
+}
+
+type createdData {
+    createdBy   : String;
+    createdname : String;
+}
+
+type Targets {
+    targetname : String(80)
+}
+
+type ModelId {
+    model_Id : String(10);
+}
+
+type getdyanamiccolumns : {
+    ID               : UUID;
+    compaRatioRanges : String(20);
+    startRange       : String(3);
+    endRange         : String(3);
+    thresholdFrom      : Decimal(5, 2);
+    thresholdTo        : Decimal(5, 2);
+    sequence         : String(3);
+};
+
+type getdyanamicModel       : {
+    performanceSubZone : String(10);
+    payzones           : String(10);
+    performanceRating  : String(50);
+    sub_zonesequence   : String(3);
+    to_columns         : many getdyanamiccolumns;
+};
+
+
+type yearfilter             : Integer;
+
+type Email                  : String(255);
+
+type Role                   : String enum {
+    approver;
+    publisher;
+}
+
+type ToItemInput {
+    id             : String;
+    text           : String;
+    value          : String;
+    threshholdfrom : String;
+    threshholdto   : String;
+    startrange     : String;
+    endrange       : String;
+    sequence       : String;
+  }
+
+  type ToHeaderInput {
+    option             : String(10);
+    performancesubzone : String;
+    payzone            : String;
+    rating             : String;
+    budget            : String;
+    total              : String;
+    Indicator          : String;
+    sequence           : String;
+    to_item            : many ToItemInput;
+  }
+
+  type CRVModelPayload {
+    TotalDistributed    : String;
+    TotalDistributedPct : String;
+    RemainingPool       : String;
+    ModelId             : String;
+    year                : String;
+    Targettab           : String;
+    RemainingPoolPct    : String;
+    to_header           : many ToHeaderInput;
+  }
 
 
 service ZHR_COMP_CAP_CRVEXCEP_SRV {
@@ -116,8 +215,15 @@ service ZHR_COMP_CAP_CRVEXCEP_SRV {
     entity CompensationRatioMaster as projection on compmodel.ZHR_COMP_TBL_COMPRATIO_MASTER;
     entity CRVException            as projection on compmodel.ZHR_COMP_TBL_CRV_EXPTN_MASTER;
     entity BusinessDivisions       as projection on compmodel.ZHR_COMP_TBL_BUDIV_MASTER;
-    entity CRVTargets                 as projection on compmodel.ZHR_COMP_TBL_TARGETTABS_MASTER;
-    entity CRVDivisions               as projection on compmodel.ZHR_COMP_TBL_BUDIV_GROUP;
+    entity CRVTargets              as projection on compmodel.ZHR_COMP_TBL_TARGETTABS_MASTER;
+    entity CRVDivisions            as projection on compmodel.ZHR_COMP_TBL_BUDIV_GROUP;
+    entity crvModelsLaunch         as projection on compmodel.ZHR_COMP_TBL_CRV_MODEL_HEADER;
+    entity Persona                 as projection on compmodel.ZHR_COMP_TBL_USER;
+    entity NumberRange             as projection on compmodel.ZHR_COMP_CRV_MODEL_NUMBERRANGE;
+    entity Constants               as projection on compmodel.ZHR_COMP_TBL_CONSTANTS;
+    entity ModelMaster             as projection on compmodel.ZHR_COMP_TBL_MODEL_MASTER;
+
+
     // Custom action for bulk insert
     action   insertMultipleThresholds(entries : array of ThresholdInput);
     action   insertMultipleSubzones(entries : array of SubZoneInput);
@@ -125,11 +231,25 @@ service ZHR_COMP_CAP_CRVEXCEP_SRV {
     action   insertMultipleBusinessDivisions(entries : array of BusinessDivisionInput);
     action   insertMultipleCRVException(entries : array of CRVExceptionInput);
     action   insertMultipleTargetTabs(entries : array of TargetTabsInput);
-    action   clearCRVExceptions(indicator:String);
-    action   createupsertTargetTabs(target:CompTargets);
+    action   clearCRVExceptions(indicator : String);
+    action   createupsertTargetTabs(nestedpayload : CompTargets);
+    action   deleteTargetTab(nestedpayload : DeleteTargetTabInput)          returns Boolean;
+    action   createnumberRange(Modeltype : String(10), year : Integer)      returns ModelId;
+      action postCRVModel(payload: CRVModelPayload) returns {
+    ok       : Boolean;
+    message  : String;
+    model_Id : String;
+  };
 
-    function readCompensationRatioMaster() returns array of CompensationRatioMaster;
-    function readTargets( year:yearfilter ) returns array of CompTargets;
+    function readCompensationRatioMaster()                                  returns array of CompensationRatioMaster;
+    function readTargets(year : yearfilter)                                 returns array of CompTargets;
+    function readCRVExceptionMaster()                                       returns array of CRVException;
+    function readStatus()                                                   returns array of ModelStatus;
+    function readTargetMaster()                                             returns array of Targets;
+    function readApprovedby()                                               returns array of ApprovedData;
+    function readCreatedby()                                                returns array of createdData;
+    function readTargetTotal(year : yearfilter, TargetTabName : String(40)) returns targetTotals;
+    function readcreatemodel(year: yearfilter) returns array of getdyanamicModel;
 
 
 //entity CRV_EXCEP_FINAL as projection on compmodel.ZHR_COMP_TBL_CRV_EXCEP_FINAL;
@@ -147,4 +267,4 @@ service ZHR_COMP_CAP_CRVEXCEP_SRV {
 // entity CRV_MODEL_THRSHLD_ITEM as projection on compmodel.ZHR_COMP_TBL_CRV_MODEL_THRSHLD_ITEM;
 }
 
-annotate ZHR_COMP_CAP_CRVEXCEP_SRV with @cds.server.body_parser.limit:'20000mb';
+annotate ZHR_COMP_CAP_CRVEXCEP_SRV with @cds.server.body_parser.limit: '20000mb';
