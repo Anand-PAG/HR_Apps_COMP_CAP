@@ -10,6 +10,13 @@ GET {{svc}}/BusinessDivisions
 ### Targettab get
 GET {{svc}}/TargetTabs
 
+### persona get
+POST /odata/v4/zhr-comp-cap-crvexcep-srv/Persona
+Content-Type: application/json
+
+{ "user_email": "alice@example.com", "role": "approver" }
+
+
 ### Target Tabs Update
 PUT {{svc}}/TargetTabs(ID='41fb91b9-4c2a-41f3-8b25-74d936abf711',year=2025,Modeltype='CRV',TargetTabName='Target1')
 Content-Type: application/json
@@ -20,8 +27,58 @@ Content-Type: application/json
   "fieldUsage": "S"
 }
 
+### CRV Model Create
+POST {{svc}}/postCRVModel
+Content-Type: application/json
 
-
+{
+  "payload": {
+    "TotalDistributed": "10000",
+    "TotalDistributedPct": "9",
+    "RemainingPool": "90000",
+    "ModelId": "CM20250001",
+    "year": "2025",
+    "Targettab": "Target",
+    "RemainingPoolPct": "9",
+    "to_header": [
+      {
+        "option": "Option1",
+        "performancesubzone": "6.1",
+        "payzone": "6",
+        "rating": "E/E",
+        "budget": "5000",
+        "total": "2500",
+        "Indicator": "X",
+        "sequence": "1",
+        "to_item": [
+          { "id": "", "text": "<80", "value": "100", "threshholdfrom": "0", "threshholdto": "79", "startrange": "0", "endrange": "79", "sequence": "1" }
+        ]
+      },
+      {
+        "option": "Option2",
+        "performancesubzone": "6.2",
+        "payzone": "6",
+        "rating": "E/C+",
+        "budget": "4000",
+        "total": "2000",
+        "Indicator": "Y",
+        "sequence": "1",
+        "to_item": []
+      },
+      {
+        "option": "Option3",
+        "performancesubzone": "4.1",
+        "payzone": "4",
+        "rating": "C/C+",
+        "budget": "3000",
+        "total": "1500",
+        "Indicator": "Z",
+        "sequence": "1",
+        "to_item": []
+      }
+    ]
+  }
+}
 
 ### ## ZHR_COMP_CAP_CRVEXCEP_SRV Draft POST
 POST {{svc}}/insertMultipleBusinessDivisions
@@ -230,3 +287,141 @@ Content-Type: application/json
 ### READ from DB
 GET http://localhost:4004/odata/v4/zhr-comp-cap-crvexcep-srv/readCompensationRatioMaster
 
+### READ from DB
+
+GET {{svc}}/readTargets
+Content-Type: application/json
+
+{
+  "year": 2025
+}
+
+### READ from Totals
+
+GET {{svc}}/readTargetTotal
+Content-Type: application/json
+
+{ 
+  "year" : 2025,
+  "TargetTabName" : "Target-3"
+}
+
+### READ from Totals
+
+GET {{svc}}/readcreatemodel
+Content-Type: application/json
+
+{ 
+  "year" : 2025
+}
+
+### Post Number Range
+
+POST {{svc}}/createnumberRange
+Content-Type: application/json
+
+{ 
+  "Modeltype" : "CRV",
+  "year" : 2025
+  
+}
+
+### READ CRV Model
+GET {{svc}}/crvModelsLaunch?$filter= year eq 2025
+Content-Type: application/json
+
+### READ CRV Approved by
+GET {{svc}}/readApprovedby
+Content-Type: application/json
+
+### READ CRV Created by
+GET {{svc}}/readCreatedby
+Content-Type: application/json
+
+### READ CRV Status
+
+GET {{svc}}/readStatus
+Content-Type: application/json
+
+### READ Targets
+GET {{svc}}/readTargetMaster
+Content-Type: application/json
+
+### POST CRV Model
+POST {{svc}}/crvModelsLaunch
+Content-Type: application/json
+
+{
+  "year" : 2025,
+  "model_Id" : "HR001",
+  "targetTab": "TargetTab1",
+  "modelOption":"3",
+  "totalsalary":"3000003",
+  "pool":"100034",
+  "pool_available":"3000045",
+  "totalDistributed":"300000",
+  "totalDistrubuted_Percentage":"2",
+  "remainingPool":"2343425",
+  "remainingPool_Percentage":"2",
+  "remainingPoolbalance":"100000",
+  "createdname":"venkata Gedala",
+  "approvedby" : "saiprasoona.moolpuru@sce.com",
+  "approvedon" : "2025-08-07",
+  "approvedname": "Sai Prasoona",
+  "approvedcomments":"Approved the Model 3",
+  "publishedon":"2025-08-08",
+  "publishedname": "Raghu Nimmalapudi",
+  "publishedby":"raghuram.nimmalapudi@sce.com",
+  "publishedcomments": "Published the Model 3",
+  "status": "P"
+}
+
+###POST TARGET Tabs
+POST {{svc}}/CRVTargets
+Content-Type: application/json
+
+{
+  "year":2025,
+  "TargetTabName":"Target1",
+  "Modeltype":"CRV",
+  "custBusUnit":"Business4",
+  "changedStatus":"X",
+  "fieldUsage":"A"
+}
+
+### POST Divisions
+
+POST {{svc}}/CRVDivisions 
+Content-Type: application/json
+
+{
+  "year":2025,
+  "TargetTabName":"Target1",
+  "Modeltype":"CRV",
+  "custBusUnit":"Business4",
+  "custDivision":"Division6"
+}
+
+### Post Targets
+
+POST {{svc}}/createupsertTargetTabs
+Content-Type: application/json
+
+{
+  "nestedpayload": {
+      "year": 2025,
+      "Modeltype": "CRV",
+      "TargetTabName": "Target10",
+      "custBusUnit": "Business50",
+      "changedStatus": "X",
+      "fieldUsage": "A",
+      "to_divisions": [
+        {
+          "custDivision": "Division50"
+        },
+        {
+          "custDivision": "Division11"
+        }
+      ]
+  }
+}
