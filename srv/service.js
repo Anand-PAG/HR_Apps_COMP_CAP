@@ -499,7 +499,7 @@ class ZHR_COMP_CAP_CRVEXCEP_SRV extends cds.ApplicationService {
 
     this.on('readTargetTotal', async (req) => {
       const { year, TargetTabName } = req.data;
-      const TargetData = await SELECT.from(CRVTargets).where({ year: year,Modeltype: 'CRV',TargetTabName: TargetTabName});
+      const TargetData = await SELECT.from(CRVTargets).where({ year: year, Modeltype: 'CRV', TargetTabName: TargetTabName });
       const Divisions = await SELECT.from(CRVDivisions).where({
         TargetTabName: TargetTabName,
         Modeltype: 'CRV',
@@ -508,16 +508,16 @@ class ZHR_COMP_CAP_CRVEXCEP_SRV extends cds.ApplicationService {
       var businessUnit = TargetData[0].custBusUnit;
       const aDivisions = Divisions.map(d => d.custDivision);
       const aExceptionData = await SELECT.from(CRVException)
-      .columns(
-        'custBusUnit',
-        'sum(curSalary) as totalSalary'
-      ).where({
-        custBusUnit: businessUnit,
-        custDivision: { in: aDivisions }
-      }).groupBy('custBusUnit');
+        .columns(
+          'custBusUnit',
+          'sum(curSalary) as totalSalary'
+        ).where({
+          custBusUnit: businessUnit,
+          custDivision: { in: aDivisions }
+        }).groupBy('custBusUnit');
       console.log(aExceptionData);
 
-      const aFinal = { year : year, TargetTabName: TargetTabName, curSalary : aExceptionData[0]?.totalSalary ?? 0.00}
+      const aFinal = { year: year, TargetTabName: TargetTabName, curSalary: aExceptionData[0]?.totalSalary ?? 0.00 }
       return aFinal;
     });
 
@@ -610,39 +610,59 @@ class ZHR_COMP_CAP_CRVEXCEP_SRV extends cds.ApplicationService {
 
     });
 
-  this.on('deleteTargetTab', async (req) => {
-    const p = (req.data && (req.data.nestedpayload || req.data)) || {};
-    const { year, Modeltype, TargetTabName, custBusUnit } = p;
+    this.before('DELETE', CRVTargets, async (req) => {
+      const { year, TargetTabName } = req.data;
+      if (!year || !TargetTabName) return;
 
-    if (!year || !Modeltype || !TargetTabName || !custBusUnit) {
-      return req.error(400, 'year, Modeltype, TargetTabName, custBusUnit are required');
-    }
-
-    const tx = cds.transaction(req);
-
-    try {
-      // find the header by natural key (your projection names)
-      const header = await tx.run(
-        SELECT.one.from(CRVTargets).where({ year, Modeltype, TargetTabName, custBusUnit })
+      const [{ count }] = await cds.run(
+        SELECT.one.from(crvModelsLaunch).columns`count(1) as count`
+          .where({ year, targetTab: TargetTabName })   // do NOT filter by model_Id or Modeltype
       );
 
-      if (!header) return true; 
+      if (count > 0) {
+        req.error(409, `Cannot delete TargetTab '${TargetTabName}' for year ${year}: referenced by ${count} CRV Model Header record(s).`);
+      }
+    });
 
-      // delete children first (or rely on FK cascade if you’ve set it)
-      await tx.run(
-        DELETE.from(CRVDivisions).where({ year, Modeltype, TargetTabName, custBusUnit })
+    this.on('deleteTargetTab', async (req) => {
+      const p = (req.data && (req.data.nestedpayload || req.data)) || {};
+      const { year, Modeltype, TargetTabName, custBusUnit } = p;
+
+      if (!year || !Modeltype || !TargetTabName || !custBusUnit) {
+        return req.error(400, 'year, Modeltype, TargetTabName, custBusUnit are required');
+      }
+
+      const tx = cds.transaction(req);
+
+      // 1) Reference check: year + targetTab only
+      const [{ count }] = await tx.run(
+        SELECT.one.from(crvModelsLaunch).columns`count(1) as count`
+          .where({ year, targetTab: TargetTabName })
       );
+      if (count > 0) {
+        return req.error(409, `Cannot delete TargetTab '${TargetTabName}' for year ${year}: referenced by ${count} CRV Model Header record(s).`);
+      }
 
-      // delete header
-      await tx.run(DELETE.from(CRVTargets).where({ ID: header.ID }));
+      try {
+        // 2) Find master row by natural key
+        const master = await tx.run(
+          SELECT.one.from(CRVTargets).where({ year, Modeltype, TargetTabName, custBusUnit })
+        );
+        if (!master) return true;
 
-      return true;
-    } catch (err) {
-      return req.error(500, `deleteTargetTab failed: ${err.message}`);
-    }
-  });
+        // 3) Delete children (group rows)
+        await tx.run(
+          DELETE.from(CRVDivisions).where({ year, Modeltype, TargetTabName, custBusUnit })
+        );
 
+        // 4) Delete master by ID
+        await tx.run(DELETE.from(CRVTargets).where({ ID: master.ID }));
 
+        return true;
+      } catch (err) {
+        return req.error(500, `deleteTargetTab failed: ${err.message}`);
+      }
+    });
 
     this.on('readCRVExceptionMaster', async () => {
       return await SELECT.from(this.entities.CRVException);
@@ -683,78 +703,265 @@ class ZHR_COMP_CAP_CRVEXCEP_SRV extends cds.ApplicationService {
       return targetdata;
     });
 
-    this.on('readApprovedby', async() => {
-      const ApprovedData = await SELECT.from(crvModelsLaunch).columns('approvedby', 'approvedname' );
+    this.on('readApprovedby', async () => {
+      const ApprovedData = await SELECT.from(crvModelsLaunch).columns('approvedby', 'approvedname');
       var Approvedby = [];
       const seen = new Set();
       ApprovedData.forEach(entry => {
         const key = `${entry.approvedby}`;
         if (!seen.has(key)) {
           seen.add(key);
-          Approvedby.push({approvedby:entry.approvedby,approvedname:entry.approvedname});
+          Approvedby.push({ approvedby: entry.approvedby, approvedname: entry.approvedname });
         }
       });
       return Approvedby;
     });
 
-    this.on('readCreatedby', async() => {
-      const CreatedData = await SELECT.from(crvModelsLaunch).columns('createdBy', 'createdname' );
+    this.on('readCreatedby', async () => {
+      const CreatedData = await SELECT.from(crvModelsLaunch).columns('createdBy', 'createdname');
       var Createdby = [];
       const seen = new Set();
       CreatedData.forEach(entry => {
         const key = `${entry.createdBy}`;
         if (!seen.has(key)) {
           seen.add(key);
-          Createdby.push({createdBy:entry.createdBy,createdname:entry.createdname});
+          Createdby.push({ createdBy: entry.createdBy, createdname: entry.createdname });
         }
       });
       return Createdby;
     });
 
-    this.on('createnumberRange', async(req) => { 
-      const { year, Modeltype } = req.data;
-      console.log(year);
-      console.log(Modeltype);
-      function padToLength4(value) {
-        return String(value || "").padStart(4, "0");
-      }
-      const aNumbers = await SELECT.from(NumberRange).where({
-        year: year,
-        Modeltype: Modeltype
-      });
-      console.log(aNumbers);
-      if (aNumbers.length > 0){
-        if(aNumbers[0].status === 'D'){
-          var Id = 'CM' + year.toString() + padToLength4(aNumbers[0].currentvalue);
-          var ModelId = { ModelId: Id }
-          return ModelId;
-        }else{
-          var next = 0;
-          next = aNumbers[0].currentvalue + 1;
-          var Id = 'CM' + year.toString() + padToLength4(next);
-          var ModelId = { ModelId: Id }
-          return ModelId;
-        }
-      }else{
-        try {
-          console.log('else satisfied');
-          await INSERT.into(NumberRange).entries({
-            year: year,
-            Modeltype: Modeltype,
-            rangefrom: 1,
-            rangeto: 9999,
-            currentvalue: 1,
-            status: 'D'
-          });
-          var Id = 'CM' + year.toString() + padToLength4(1);
-          var ModelId = { ModelId: Id }
-          return ModelId;
-        } catch (error) {
-          return 'N/A'
-        }
-        
-      }
+    // this.on('createnumberRange', async (req) => {
+    //   const { year, Modeltype } = req.data;
+    //   console.log(year);
+    //   console.log(Modeltype);
+    //   function padToLength4(value) {
+    //     return String(value || "").padStart(4, "0");
+    //   }
+    //   const aNumbers = await SELECT.from(NumberRange).where({
+    //     year: year,
+    //     Modeltype: Modeltype
+    //   });
+    //   console.log(aNumbers);
+    //   if (aNumbers.length > 0) {
+    //     if (aNumbers[0].status === 'D') {
+    //       var Id = 'CM' + year.toString() + padToLength4(aNumbers[0].currentvalue);
+    //       var ModelId = { ModelId: Id }
+    //       return ModelId;
+    //     } else {
+    //       var next = 0;
+    //       next = aNumbers[0].currentvalue + 1;
+    //       var Id = 'CM' + year.toString() + padToLength4(next);
+    //       var ModelId = { ModelId: Id }
+    //       return ModelId;
+    //     }
+    //   } else {
+    //     try {
+    //       console.log('else satisfied');
+    //       await INSERT.into(NumberRange).entries({
+    //         year: year,
+    //         Modeltype: Modeltype,
+    //         rangefrom: 1,
+    //         rangeto: 9999,
+    //         currentvalue: 1,
+    //         status: 'D'
+    //       });
+    //       var Id = 'CM' + year.toString() + padToLength4(1);
+    //       var ModelId = { ModelId: Id }
+    //       return ModelId;
+    //     } catch (error) {
+    //       return 'N/A'
+    //     }
+
+    //   }
+    // });
+
+    this.on('createnumberRange', async (req) => {
+  const { year, Modeltype } = req.data;
+  const pad = n => String(n || 0).padStart(4, '0');
+
+  let row = await SELECT.one.from(NumberRange).where({ year, Modeltype });
+
+  if (!row) {
+    // first time for this year/type → start at 1 (draft)
+    await INSERT.into(NumberRange).entries({
+      year, Modeltype, rangefrom: 1, rangeto: 9999, currentvalue: 1, status: 'D'
     });
+    row = { year, Modeltype, currentvalue: 1, status: 'D' };
+  } else if (row.status === 'A') {
+    // last one was finalized → move to next and mark as draft (reserve it)
+    const next = Math.min((row.currentvalue || 0) + 1, row.rangeto || 9999);
+    await UPDATE(NumberRange)
+      .set({ currentvalue: next, status: 'D' })
+      .where({ year, Modeltype });
+    row.currentvalue = next;
+    row.status = 'D';
+  }
+  // If status is already 'D', we just return the reserved one again.
+
+  return { ModelId: `CM${year}${pad(row.currentvalue)}` };
+});
+
+
+    this.on('postCRVModel', async (req) => {
+      const b = req.data.payload || req.data;
+
+      const model_Id = b.ModelId;
+      const year = Number(b.year);
+      const targetTab = b.Targettab;
+      if (!model_Id || !year || !targetTab) return req.error(400, 'ModelId, year, Targettab are required');
+
+      const totalsalary = 0;
+      const pool = Number(b.TotalDistributedPct ?? 0);
+      const pool_available = 0;
+      const totalDistributed = Number(b.TotalDistributed ?? 0);
+      const totalDistrubuted_Percentage = Number(b.TotalDistributedPct ?? 0);
+      const remainingPool = Number(b.RemainingPool ?? 0);
+      const remainingPool_Percentage = Number(b.RemainingPoolPct ?? 0);
+      const remainingPoolbalance = 0;
+
+      const byOption = new Map();
+      for (const h of b.to_header || []) {
+        const key = String(h.option || 'Option1').trim();
+        if (!byOption.has(key)) byOption.set(key, []);
+        byOption.get(key).push(h);
+      }
+
+      const tx = cds.transaction(req);
+      const MODEL_HEADER = 'com.compmodel.ZHR_COMP_TBL_CRV_MODEL_HEADER';
+
+      for (const [option, rows] of byOption.entries()) {
+        const entry = {
+          model_Id,
+          year,
+          targetTab,
+          modelOption: option,
+          totalsalary,
+          pool,
+          pool_available,
+          totalDistributed,
+          totalDistrubuted_Percentage,
+          remainingPool,
+          remainingPool_Percentage,
+          remainingPoolbalance,
+          status: 'S',
+          to_ThresholdHeaders: rows.map((r, idx) => ({
+            year,
+            model_Id,
+            targetTab,
+            modelOption: option,
+            custPerformancesubZone: String(r.performancesubzone || ''),
+            payzones: String(r.payzone || ''),
+            custPDScore: String(r.rating || ''),
+            sequence: String(r.sequence || String(idx + 1)),
+            count: 0,
+            totalBudget: Number(r.budget || 0),
+            totalCost: Number(r.total || 0),
+            indicator: String(r.Indicator || ''),
+            status: 'S',
+            to_ThresholdItems: (r.to_item || []).map((it, j) => ({
+              year,
+              model_Id,
+              modelOption: option,
+              targetTab,
+              custPerformancesubZone: String(r.performancesubzone || ''),
+              payzones: String(r.payzone || ''),
+              custPDScore: String(r.rating || ''),
+              threshold_Id: cds.utils.uuid(),
+              compaRatioRanges: String(it.text || ''),
+              startRange: String(it.startrange || ''),
+              endRange: String(it.endrange || ''),
+              percentage_val_from: Number(it.threshholdfrom || 0),
+              percentage_val_to: Number(it.threshholdto || 0),
+              percentage_text: `${it.threshholdfrom || 0}-${it.threshholdto || 0}%`,
+              value: Number(it.value || 0),
+              sequence: String(it.sequence || String(j + 1)),
+              fieldUsage: 'A',
+              status: 'S'
+            }))
+          }))
+        };
+
+        await tx.run(INSERT.into(MODEL_HEADER).entries(entry));
+      }
+
+      return { ok: true, message: 'Inserted', model_Id };
+    });
+
+    // after the inserts in postCRVModel finish successfully
+    this.after('postCRVModel', async (result, req) => {
+      if (!result?.ok) return;                   // only if save succeeded
+
+      const b = req.data.payload || req.data;    // original input
+      const year = Number(b.year);
+      const modelId = result.model_Id || b.ModelId;
+      const seq = parseInt(modelId.slice(-4), 10); // CM20250017 -> 17
+
+      await cds.transaction(req).run(
+        UPDATE(this.entities.NumberRange)
+          .set({ status: 'A' })
+          .where({ year, Modeltype: 'CRV', currentvalue: seq })
+      );
+    });
+
+
+    this.on('readcreatemodel', async (req) => {
+      const { year } = req.data;
+      const compRatioMaster = await SELECT.from(CompensationRatioMaster).where({
+        year: year,
+        status: 'A'
+      });
+      if (compRatioMaster.length>0) {
+        console.log("CRM",compRatioMaster);
+        const subzones = await SELECT.from(SubZones).where({
+          year: year,
+          fieldUsage: 'A'
+        }).orderBy('sequence');
+        if (subzones.length>0) {
+          
+          const threshholdMaster = await SELECT.from(Thresholds).where({
+            year: year,
+            fieldUsage: 'A'
+          }).orderBy('sequence');
+          if(threshholdMaster.length>0) return null;
+          const subzonesdata = subzones.map(c => ({
+            performanceRating: compRatioMaster.find(s => s.performanceSubZone === c.performanceSubZone)?.performanceRating || '',
+            performanceSubZone: c.performanceSubZone,
+            payzones: compRatioMaster.find(s => s.performanceSubZone === c.performanceSubZone)?.payzones || '',
+            sub_zonesequence: c.sequence
+          })).sort((a, b) => Number(a.sub_zonesequence) - Number(b.sub_zonesequence));
+          const aCompensationData = subzonesdata.map(c => ({
+            performanceRating: c.performanceRating,
+            performanceSubZone: c.performanceSubZone,
+            payzones: c.payzones,
+            sub_zonesequence: c.sub_zonesequence,
+            to_columns: threshholdMaster.map(d => ({
+              ID: d.ID,
+              compaRatioRanges: d.compaRatioRanges,
+              startRange: d.startRange,
+              endRange: d.endRange,
+              thresholdFrom: compRatioMaster.find(s => s.performanceSubZone === c.performanceSubZone
+                && s.performanceRating === c.performanceRating
+                && s.payzones === c.payzones
+                && s.compaRatioRanges === d.compaRatioRanges
+              )?.thresholdFrom || '',
+              thresholdTo: compRatioMaster.find(s => s.performanceSubZone === c.performanceSubZone
+                && s.performanceRating === c.performanceRating
+                && s.payzones === c.payzones
+                && s.compaRatioRanges === d.compaRatioRanges
+              )?.thresholdTo || '',
+              sequence: d.sequence
+            })).sort((a, b) => Number(a.sequence) - Number(b.sequence))
+          }));
+          return aCompensationData;
+        } else {
+          return null;
+        }
+
+      } else {
+        return null;
+      }
+    })
 
     return super.init();
   }

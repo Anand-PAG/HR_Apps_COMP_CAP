@@ -27,7 +27,58 @@ Content-Type: application/json
   "fieldUsage": "S"
 }
 
+### CRV Model Create
+POST {{svc}}/postCRVModel
+Content-Type: application/json
 
+{
+  "payload": {
+    "TotalDistributed": "10000",
+    "TotalDistributedPct": "9",
+    "RemainingPool": "90000",
+    "ModelId": "CM20250001",
+    "year": "2025",
+    "Targettab": "Target",
+    "RemainingPoolPct": "9",
+    "to_header": [
+      {
+        "option": "Option1",
+        "performancesubzone": "6.1",
+        "payzone": "6",
+        "rating": "E/E",
+        "budget": "5000",
+        "total": "2500",
+        "Indicator": "X",
+        "sequence": "1",
+        "to_item": [
+          { "id": "", "text": "<80", "value": "100", "threshholdfrom": "0", "threshholdto": "79", "startrange": "0", "endrange": "79", "sequence": "1" }
+        ]
+      },
+      {
+        "option": "Option2",
+        "performancesubzone": "6.2",
+        "payzone": "6",
+        "rating": "E/C+",
+        "budget": "4000",
+        "total": "2000",
+        "Indicator": "Y",
+        "sequence": "1",
+        "to_item": []
+      },
+      {
+        "option": "Option3",
+        "performancesubzone": "4.1",
+        "payzone": "4",
+        "rating": "C/C+",
+        "budget": "3000",
+        "total": "1500",
+        "Indicator": "Z",
+        "sequence": "1",
+        "to_item": []
+      }
+    ]
+  }
+}
 
 ### ## ZHR_COMP_CAP_CRVEXCEP_SRV Draft POST
 POST {{svc}}/insertMultipleBusinessDivisions
@@ -253,6 +304,15 @@ Content-Type: application/json
 { 
   "year" : 2025,
   "TargetTabName" : "Target-3"
+}
+
+### READ from Totals
+
+GET {{svc}}/readcreatemodel
+Content-Type: application/json
+
+{ 
+  "year" : 2025
 }
 
 ### Post Number Range

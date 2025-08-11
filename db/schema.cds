@@ -30,6 +30,11 @@ entity ZHR_COMP_TBL_USER {
     key role             : String;
 }
 
+entity ZHR_COMP_TBL_CONSTANTS {
+    key fileName     : String;
+    locationPath     : String;
+}
+
 // Threshold Master Table
 entity ZHR_COMP_TBL_THRSHLD_MASTER : managed {
     key ID               : UUID;
@@ -78,6 +83,8 @@ entity ZHR_COMP_TBL_COMPRATIO_MASTER : managed {
         status             : fieldUsage1;
         path               : String;
 }
+
+//STIP CORP GUIDE
 
 // CRV Exception Master Table
 entity ZHR_COMP_TBL_CRV_EXPTN_MASTER : managed {
@@ -758,6 +765,7 @@ entity ZHR_COMP_TBL_CRV_MODEL_THRSHLD_HEADER : cuid, managed {
     key modelOption            : String(10);
         payzones               : String(10);
         custPDScore            : String(50);
+        sequence               : String(3) @assert.format: '^[0-9]{1,3}$';
         count                  : Integer default 0;
         totalBudget            : Decimal(17, 2) default 0.00;
         totalCost              : Decimal(17, 2) default 0.00;
@@ -788,8 +796,11 @@ entity ZHR_COMP_TBL_CRV_MODEL_THRSHLD_ITEM : cuid, managed {
     key threshold_Id           : UUID;
         value                  : Decimal(5, 2) default 0.00;
         sequence               : String(3) @assert.format: '^[0-9]{1,3}$';
-        percentage_val_from    : Integer default 0;
-        percentage_val_to      : Integer default 0;
+        compaRatioRanges : String(20);
+        startRange       : String(3) @assert.format: '^[0-9]{1,3}$';
+        endRange         : String(3) @assert.format: '^[0-9]{1,3}$';
+        percentage_val_from    : Decimal(5, 2) default 0.00;
+        percentage_val_to      : Decimal(5, 2) default 0.00;
         percentage_text        : String(50);
         fieldUsage             : fieldUsage;
         status                 : StatusCode; //O - Obselete, A- Approved,S-Save,P-Published
