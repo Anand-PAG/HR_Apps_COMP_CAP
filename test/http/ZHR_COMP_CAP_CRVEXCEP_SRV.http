@@ -315,6 +315,26 @@ Content-Type: application/json
   "year" : 2025
 }
 
+### READ from Totals
+
+GET {{svc}}/readModelId
+Content-Type: application/json
+
+{ 
+  "year" : 2025
+}
+
+### READ from Totals
+
+GET {{svc}}/readModelData
+Content-Type: application/json
+
+{ 
+  "year" : 2025,
+  "modelId" : "CM20250015",
+  "option":"Option1"
+}
+
 ### Post Number Range
 
 POST {{svc}}/createnumberRange

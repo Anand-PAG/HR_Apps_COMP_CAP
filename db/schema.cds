@@ -501,45 +501,87 @@ entity ZHR_COMP_TBL_STIP_CALIBRATION : cuid, managed {
 
 // CRV Model Calibration Table
 @cds.persistence.skip
+entity ZHR_COMP_TBL_CRV_EXPTN_FINAL : managed {
+    key ID                       : UUID;
+        custBusUnit              : String(80);
+        custDivision             : String(80);
+        custDepartment           : String(80);
+        mgrFirstName             : String(60);
+        mgrLastName              : String(60);
+        custPERNR                : Integer;
+        userName                 : String(80);
+        custHireDate             : Date;
+        jobCode                  : String(40);
+        jobTitle                 : String(80);
+        custPerformanceZone      : String(10);
+        custPerformanceSubZone   : String(10);
+        custPDScore              : String(40);
+
+        curSalary                : Decimal(17,2) default 0.00;
+        custCurHrlySalary        : Decimal(17,2) default 0.00;
+        custPayGradeLevel        : Integer default 0;
+        compaRatio_Percentage      : Decimal(5,2) @assert.range:[0.00,500.00] default 0.00; // %curRatio
+        compaRatioGTE120         : Boolean default false;                                 // Compa-Ratio >= 120
+        payGuideMid              : Decimal(17,2) default 0.00;
+
+        custMeritExcepReqPct     : Decimal(5,2) @assert.range:[0.00,200.00] default 0.00;
+        modeledAmount            : Decimal(17,2) default 0.00;                            // Modeled $ Amount
+        newModeledAnnual         : Decimal(17,2) default 0.00;                            // New Modeled Annual $
+        exception_Percentage     : Decimal(5,2) @assert.range:[0.00,200.00] default 0.00; // Exception %
+        custMeritExcepReqAmt     : Decimal(17,2) default 0.00;
+        custfinSalaryExcepReq    : Decimal(17,2) default 0.00;
+        custMeritExcepReqComment : String;
+
+        custMeritPct             : Decimal(5,2) @assert.range:[0.00,200.00] default 0.00;
+        plannedAmount            : Decimal(17,2) default 0.00;                            // Planned $ Amount
+        custfinHrlyRate          : Decimal(17,2) default 0.00;
+        finSalary                : Decimal(17,2) default 0.00;
+        newCompaRatio_Pct    : Decimal(5,2) @assert.range:[0.00,500.00] default 0.00; // %compaRatio
+        compaRatio2GTE120        : Boolean default false;                                 // Compa Ratio >=120 (second occurrence)
+
+        meritGuideline           : String(40);
+        withinGuidelines         : Boolean default false;
+        custExceptionCode        : String(200);
+        salaryNote               : String;
+
+        lumpSum_Percentage       : Decimal(5,2) @assert.range:[0.00,100.00] default 0.00; // %lumpSum
+        lumpSum                  : Decimal(17,2) default 0.00;
+        basePayAdjustment        : Decimal(17,2) default 0.00;
+        basePayAdjustment_Per    : Decimal(5,2) @assert.range:[0.00,200.00] default 0.00; // %Base Pay Adjustment
+        finalPayAmount           : Decimal(17,2) default 0.00;                            // Final Pay $
+        commentForMerit          : String;
+
+        planned_Percent         : Decimal(5,2) @assert.range:[0.00,200.00] default 0.00; // Planned %3
+        exceptionCode           : String;
+        exceptionComment        : String;
+        lumpSum_Percentage1     : Decimal(5,2) @assert.range:[0.00,100.00] default 0.00; // Lump Sum %6
+
+        min                     : Integer;
+        max                     : Integer;
+        budgetAmount            : Decimal(17,2) default 0.00;
+        preCRRange              : String(50);
+}
+@cds.persistence.skip
 entity ZHR_COMP_TBL_CRV_CALIBRATION : cuid, managed {
-    key ID                     : UUID;
+    key ID            : UUID;
     key year                   : Integer;
-        calibrationName        : String;
-        totalBudget            : Decimal;
-        totalSpend             : Decimal;
-        annualRemainingPool    : Decimal;
-        merit                  : Decimal;
-        lumpSum                : Decimal;
-        distributed_Percentage : Decimal;
-        custBusUnit            : String;
-        custDivision           : String;
-        managerName            : String;
-        jobTitle               : String;
-        custPDScore            : String;
-        performanceSubZone     : String;
-        jbCode                 : String;
-        compaRatio             : Decimal;
+        calibrationName        : String(40);
+        totalBudget            : Decimal(17,2) default 0.00;
+        totalSpend             : Decimal(17,2) default 0.00;
+        annualRemainingPool    : Decimal(5,2) @assert.range:[0.00,100.00] default 0.00;
+        merit                  : Decimal(17,2) default 0.00;
+        lumpSum                : Decimal(5,2) @assert.range:[0.00,100.00] default 0.00;
+        distributed_Percentage : Decimal(5,2) @assert.range:[0.00,100.00] default 0.00;
+        custBusUnit            : String(80);
+        custDivision           : String(80);
+        managerName            : String(80);
+        jobTitle               : String(80);
+        custPDScore            : String(40);
+        performanceSubZone     : String(10);
+        jobCode                : String(40);
+        compaRatio             : Decimal(5,2) @assert.range:[0.00,100.00] default 0.00;
 }
 
-// entity ZHR_COMP_TBL_CRV_CALIBRATION : cuid, managed {
-//     key ID            : UUID;
-//     key year                   : Integer(4);
-//         calibrationName        : String(20);
-//         totalBudget            : Decimal;
-//         totalSpend             : Decimal;
-//         annualRemainingPool    : Decimal;
-//         merit                  : Decimal;
-//         lumpSum                : Decimal;
-//         distributed_Percentage : Decimal;
-//         custBusUnit            : String(60);
-//         custDivision           : String(60);
-//         managerName            : String;
-//         jobTitle               : String(60);
-//         custPDScore            : String(20);
-//         performanceSubZone     : String(10);
-//         jobCode                : String(25);
-//         compaRatio             : Decimal(6);
-// }
 
 // RSU Model Calibration Table
 @cds.persistence.skip

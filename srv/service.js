@@ -777,30 +777,30 @@ class ZHR_COMP_CAP_CRVEXCEP_SRV extends cds.ApplicationService {
     // });
 
     this.on('createnumberRange', async (req) => {
-  const { year, Modeltype } = req.data;
-  const pad = n => String(n || 0).padStart(4, '0');
+      const { year, Modeltype } = req.data;
+      const pad = n => String(n || 0).padStart(4, '0');
 
-  let row = await SELECT.one.from(NumberRange).where({ year, Modeltype });
+      let row = await SELECT.one.from(NumberRange).where({ year, Modeltype });
 
-  if (!row) {
-    // first time for this year/type → start at 1 (draft)
-    await INSERT.into(NumberRange).entries({
-      year, Modeltype, rangefrom: 1, rangeto: 9999, currentvalue: 1, status: 'D'
+      if (!row) {
+        // first time for this year/type → start at 1 (draft)
+        await INSERT.into(NumberRange).entries({
+          year, Modeltype, rangefrom: 1, rangeto: 9999, currentvalue: 1, status: 'D'
+        });
+        row = { year, Modeltype, currentvalue: 1, status: 'D' };
+      } else if (row.status === 'A') {
+        // last one was finalized → move to next and mark as draft (reserve it)
+        const next = Math.min((row.currentvalue || 0) + 1, row.rangeto || 9999);
+        await UPDATE(NumberRange)
+          .set({ currentvalue: next, status: 'D' })
+          .where({ year, Modeltype });
+        row.currentvalue = next;
+        row.status = 'D';
+      }
+      // If status is already 'D', we just return the reserved one again.
+
+      return { ModelId: `CM${year}${pad(row.currentvalue)}` };
     });
-    row = { year, Modeltype, currentvalue: 1, status: 'D' };
-  } else if (row.status === 'A') {
-    // last one was finalized → move to next and mark as draft (reserve it)
-    const next = Math.min((row.currentvalue || 0) + 1, row.rangeto || 9999);
-    await UPDATE(NumberRange)
-      .set({ currentvalue: next, status: 'D' })
-      .where({ year, Modeltype });
-    row.currentvalue = next;
-    row.status = 'D';
-  }
-  // If status is already 'D', we just return the reserved one again.
-
-  return { ModelId: `CM${year}${pad(row.currentvalue)}` };
-});
 
 
     this.on('postCRVModel', async (req) => {
@@ -911,19 +911,19 @@ class ZHR_COMP_CAP_CRVEXCEP_SRV extends cds.ApplicationService {
         year: year,
         status: 'A'
       });
-      if (compRatioMaster.length>0) {
-        console.log("CRM",compRatioMaster);
+      if (compRatioMaster.length > 0) {
+        console.log("CRM", compRatioMaster);
         const subzones = await SELECT.from(SubZones).where({
           year: year,
           fieldUsage: 'A'
         }).orderBy('sequence');
-        if (subzones.length>0) {
-          
+        if (subzones.length > 0) {
+
           const threshholdMaster = await SELECT.from(Thresholds).where({
             year: year,
             fieldUsage: 'A'
           }).orderBy('sequence');
-          if(threshholdMaster.length>0) return null;
+          if (threshholdMaster.length <= 0) return null;
           const subzonesdata = subzones.map(c => ({
             performanceRating: compRatioMaster.find(s => s.performanceSubZone === c.performanceSubZone)?.performanceRating || '',
             performanceSubZone: c.performanceSubZone,
@@ -961,7 +961,118 @@ class ZHR_COMP_CAP_CRVEXCEP_SRV extends cds.ApplicationService {
       } else {
         return null;
       }
-    })
+    });
+
+    this.on('readModelData', async (req) => {
+      const { year, modelId, option } = req.data;
+      var modelHeaders, modelItems;
+      const model = await SELECT.from("com.compmodel.ZHR_COMP_TBL_CRV_MODEL_HEADER").where({
+        year: year,
+        model_Id: modelId,
+        modelOption: option
+      });
+      if (model.length > 0) {
+        modelHeaders = await SELECT.from("com.compmodel.ZHR_COMP_TBL_CRV_MODEL_THRSHLD_HEADER").where({
+          year: year,
+          model_Id: modelId,
+          modelOption: option
+        });
+        if (modelHeaders.length > 0) {
+          modelItems = await SELECT.from("com.compmodel.ZHR_COMP_TBL_CRV_MODEL_THRSHLD_ITEM").where({
+            year: year,
+            model_Id: modelId,
+            modelOption: option
+          });
+        }
+        else {
+          return null;
+        }
+        const groupedItems = {};
+        for (const item of modelItems) {
+          const key = `${item.custPerformancesubZone}|${item.payzones}|${item.custPDScore}`;
+          if (!groupedItems[key]) groupedItems[key] = [];
+          groupedItems[key].push({
+            ID: item.threshold_Id,
+            compaRatioRanges: item.compaRatioRanges,
+            startRange: item.startRange,
+            endRange: item.endRange,
+            thresholdFrom: item.percentage_val_from,
+            thresholdTo: item.percentage_val_to,
+            sequence: item.sequence
+          });
+        }
+
+        // Prepare and sort headers and nested items
+        const sortedModelHeaders = modelHeaders.map(header => {
+          const key = `${header.custPerformancesubZone}|${header.payzones}|${header.custPDScore}`;
+          const columns = groupedItems[key] || [];
+
+          // Sort to_columns by sequence (as number if possible)
+          columns.sort((a, b) => {
+            return parseInt(a.sequence) - parseInt(b.sequence);
+          });
+
+          return {
+            performanceSubZone: header.custPerformancesubZone,
+            payzones: header.payzones,
+            performanceRating: header.custPDScore,
+            sub_zonesequence: header.sequence,
+            count: header.count,
+            totalBudget: header.totalBudget,
+            totalCost: header.totalCost,
+            indicator: header.indicator,
+            to_columns: columns
+          };
+        });
+
+        // Sort to_modelheader by sub_zonesequence (as number if possible)
+        sortedModelHeaders.sort((a, b) => {
+          return parseInt(a.sub_zonesequence) - parseInt(b.sub_zonesequence);
+        });
+
+        // Final response
+        const response = {
+          ID: model[0].ID,
+          year: model[0].year,
+          model_Id: model[0].model_Id,
+          targetTab: model[0].targetTab,
+          modelOption: model[0].modelOption,
+          totalsalary: model[0].totalsalary,
+          pool: model[0].pool,
+          pool_available: model[0].pool_available,
+          totalDistributed: model[0].totalDistributed,
+          totalDistrubuted_Percentage: model[0].totalDistrubuted_Percentage,
+          remainingPool: model[0].remainingPool,
+          remainingPool_Percentage: model[0].remainingPool_Percentage,
+          status: model[0].status,
+          to_modelheader: sortedModelHeaders
+        };
+        console.log(response);
+        return response;
+      } else {
+        return null;
+      }
+    });
+
+    this.on('readModelId', async (req) => {
+      const { year } = req.data;
+      const model = await SELECT.from("com.compmodel.ZHR_COMP_TBL_CRV_MODEL_HEADER").where({
+        year: year
+      });
+      if (model.length > 0) {
+        console.log(model);
+        var Models = [];
+        const seen = new Set();
+        model.forEach(entry => {
+          const key = `${entry.model_Id}`;
+          if (!seen.has(key)) {
+            seen.add(key);
+            Models.push({ model_Id: entry.model_Id });
+          }
+        });
+        return Models;
+      }
+    });
 
     return super.init();
   }
