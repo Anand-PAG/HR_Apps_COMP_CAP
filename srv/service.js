@@ -499,14 +499,23 @@ class ZHR_COMP_CAP_CRVEXCEP_SRV extends cds.ApplicationService {
 
     this.on('readTargetTotal', async (req) => {
       const { year, TargetTabName } = req.data;
+      const CompensationRatioMaster = cds.entities['com.compmodel.ZHR_COMP_TBL_COMPRATIO_MASTER'];
+      const Thresholds = cds.entities['com.compmodel.ZHR_COMP_TBL_THRSHLD_MASTER'];
+      const db = cds.db;
       const TargetData = await SELECT.from(CRVTargets).where({ year: year, Modeltype: 'CRV', TargetTabName: TargetTabName });
       const Divisions = await SELECT.from(CRVDivisions).where({
         TargetTabName: TargetTabName,
         Modeltype: 'CRV',
         year: year
       });
-      var businessUnit = TargetData[0].custBusUnit;
-      const aDivisions = Divisions.map(d => d.custDivision);
+      console.log(TargetData.length);
+      if (TargetData.length === 0) {
+        return null;
+      }
+      var businessUnit = TargetData[0].custBusUnit || '';
+      const aDivisions = Divisions.map(d => d.custDivision) || [];
+      console.log(businessUnit);
+      console.log(aDivisions);
       const aExceptionData = await SELECT.from(CRVException)
         .columns(
           'custBusUnit',
@@ -515,9 +524,134 @@ class ZHR_COMP_CAP_CRVEXCEP_SRV extends cds.ApplicationService {
           custBusUnit: businessUnit,
           custDivision: { in: aDivisions }
         }).groupBy('custBusUnit');
-      console.log(aExceptionData);
+      const pdpwisedata = await db.run(
+        SELECT
+          .from(CRVException)
+          .columns(
+            'custPerformanceZone',
+            'custPDScore',
+            'sum(curSalary) as totalbudget',
+            'count(custPERNR) as totalcount'
+          )
+          .where({
+            custBusUnit: businessUnit,
+            custDivision: { in: aDivisions }
+          })
+          .groupBy('custPerformanceZone', 'custPDScore')
+      );
+      //const thr = await SELECT.from(Thresholds);
 
-      const aFinal = { year: year, TargetTabName: TargetTabName, curSalary: aExceptionData[0]?.totalSalary ?? 0.00 }
+      const compRatio = await SELECT
+        .from('com.compmodel.ZHR_COMP_TBL_COMPRATIO_MASTER as cm' )
+        .join('com.compmodel.ZHR_COMP_TBL_THRSHLD_MASTER as th')
+        .on(`cm.compaRatioRanges = th.compaRatioRanges
+             AND cm.startRange = th.startRange
+             AND cm.endRange = th.endRange  `)
+        .columns(
+          'cm.compaRatioRanges',
+          'cm.payzones',
+          'cm.performanceRating',
+          'cm.performanceSubZone',
+          'cm.startRange',
+          'cm.endRange',
+          'th.sequence'
+        )
+        .where(`cm.year = '${year}' AND cm.status = 'A'`);
+      const expanded = compRatio.flatMap(entry => {
+        const ratings = entry.performanceRating.split(',').map(r => r.trim());
+        return ratings.map(rating => ({
+          ...entry,
+          performanceRating: rating
+        }));
+      });
+      const crvdata = await SELECT
+        .from(CRVException)
+        .columns(
+          'custPerformanceZone',
+          'custPDScore',
+          'curSalary',
+          'curRatio'
+        )
+        .where({
+          custBusUnit: businessUnit,
+          custDivision: { in: aDivisions }
+        });
+
+      const sumData = expanded.map(rule => {
+        const base = crvdata.reduce((sum, data) => {
+          const sameRating = data.custPDScore === rule.performanceRating;
+          const sameZone = data.custPerformanceZone === rule.payzones;
+          const ratio = parseFloat(data.curRatio);
+          const inRange =
+            rule.endRange && rule.endRange !== 0
+              ? ratio >= rule.startRange && ratio <= rule.endRange
+              : ratio >= rule.startRange;
+
+          return sameRating && sameZone && inRange
+            ? sum + parseFloat(data.curSalary)
+            : sum;
+        }, 0);
+
+        return {
+          payzones: rule.payzones,
+          performanceRating: rule.performanceRating,
+          range: rule.compaRatioRanges,
+          performanceSubZone: rule.performanceSubZone,
+          sequence: rule.sequence,
+          base: +base.toFixed(2)
+        };
+      });
+
+      //Group and merge with comma seperated again
+      const grouped = {};
+
+      for (const item of sumData) {
+        const key = `${item.payzones}|${item.performanceSubZone}|${item.range}`;
+
+        if (!grouped[key]) {
+          grouped[key] = {
+            payzones: item.payzones,
+            performanceSubZone: item.performanceSubZone,
+            compaRatioRanges: item.range,
+            sequence: item.sequence,
+            performanceRatingSet: new Set(),
+            base: 0
+          };
+        }
+
+        grouped[key].performanceRatingSet.add(item.performanceRating);
+        grouped[key].base += item.base;
+      }
+
+      // Convert Set to comma-separated string and return final output
+      const output = Object.values(grouped).map(g => ({
+        payzones: g.payzones,
+        performanceSubZone: g.performanceSubZone,
+        compaRatioRanges: g.compaRatioRanges,
+        sequence: g.sequence,
+        performanceRating: Array.from(g.performanceRatingSet).join(','),
+        base: +g.base.toFixed(2)
+      }));
+
+      const aFinal = {
+        year: year, TargetTabName: TargetTabName,
+        curSalary: aExceptionData[0]?.totalSalary ?? 0.00,
+        to_pdpwise: pdpwisedata.map(pd => ({
+          payzones: pd.custPerformanceZone,
+          performanceRating: pd.custPDScore,
+          count: pd.totalcount,
+          totalbudget: pd.totalbudget,
+          to_ratiowise: output.filter(f =>
+            f.payzones === pd.custPerformanceZone
+          ).map(t => ({
+            performanceSubZone: t.performanceSubZone,
+            compaRatioRanges: t.compaRatioRanges,
+            sequence: t.sequence,
+            base: t.base
+          })) || []
+        })) || [],
+
+      }
       return aFinal;
     });
 
@@ -802,23 +936,24 @@ class ZHR_COMP_CAP_CRVEXCEP_SRV extends cds.ApplicationService {
       return { ModelId: `CM${year}${pad(row.currentvalue)}` };
     });
 
-
     this.on('postCRVModel', async (req) => {
       const b = req.data.payload || req.data;
 
       const model_Id = b.ModelId;
+      const modelName = b.modelName;
+      const createdname = b.createdname;
       const year = Number(b.year);
       const targetTab = b.Targettab;
       if (!model_Id || !year || !targetTab) return req.error(400, 'ModelId, year, Targettab are required');
 
-      const totalsalary = 0;
-      const pool = Number(b.TotalDistributedPct ?? 0);
-      const pool_available = 0;
-      const totalDistributed = Number(b.TotalDistributed ?? 0);
-      const totalDistrubuted_Percentage = Number(b.TotalDistributedPct ?? 0);
-      const remainingPool = Number(b.RemainingPool ?? 0);
-      const remainingPool_Percentage = Number(b.RemainingPoolPct ?? 0);
-      const remainingPoolbalance = 0;
+      const totalsalary = parseFloat(b.totalsalary ?? 0) || 0;
+      const pool = parseFloat(b.pool ?? 0) || 0;
+      const pool_available = parseFloat(b.pool_available ?? 0) || 0;
+      const totalDistributed = parseFloat(b.totalDistributed ?? 0) || 0;
+      const totalDistrubuted_Percentage = parseFloat(b.totalDistrubuted_Percentage ?? 0) || 0;
+      const remainingPool = parseFloat(b.remainingPool ?? 0) || 0;
+      const remainingPool_Percentage = parseFloat(b.remainingPool_Percentage ?? 0) || 0;
+      const remainingPoolbalance = parseFloat(b.remainingPoolbalance ?? 0) || 0;
 
       const byOption = new Map();
       for (const h of b.to_header || []) {
@@ -829,7 +964,7 @@ class ZHR_COMP_CAP_CRVEXCEP_SRV extends cds.ApplicationService {
 
       const tx = cds.transaction(req);
       const MODEL_HEADER = 'com.compmodel.ZHR_COMP_TBL_CRV_MODEL_HEADER';
-
+      //console.log("MN",modelName);
       for (const [option, rows] of byOption.entries()) {
         const entry = {
           model_Id,
@@ -845,6 +980,8 @@ class ZHR_COMP_CAP_CRVEXCEP_SRV extends cds.ApplicationService {
           remainingPool_Percentage,
           remainingPoolbalance,
           status: 'S',
+          modelName,
+          createdname,
           to_ThresholdHeaders: rows.map((r, idx) => ({
             year,
             model_Id,
@@ -854,7 +991,7 @@ class ZHR_COMP_CAP_CRVEXCEP_SRV extends cds.ApplicationService {
             payzones: String(r.payzone || ''),
             custPDScore: String(r.rating || ''),
             sequence: String(r.sequence || String(idx + 1)),
-            count: 0,
+            count: r.count,
             totalBudget: Number(r.budget || 0),
             totalCost: Number(r.total || 0),
             indicator: String(r.Indicator || ''),
@@ -875,17 +1012,19 @@ class ZHR_COMP_CAP_CRVEXCEP_SRV extends cds.ApplicationService {
               percentage_val_to: Number(it.threshholdto || 0),
               percentage_text: `${it.threshholdfrom || 0}-${it.threshholdto || 0}%`,
               value: Number(it.value || 0),
+              basecost: parseFloat(it.basecost).toFixed(2) || 0.00,
               sequence: String(it.sequence || String(j + 1)),
               fieldUsage: 'A',
               status: 'S'
             }))
           }))
         };
-
+        console.log('-----------test payload----------')
+        console.log(entry);
         await tx.run(INSERT.into(MODEL_HEADER).entries(entry));
       }
 
-      return { ok: true, message: 'Inserted', model_Id };
+      return { ok: true, message: 'Saved', model_Id };
     });
 
     // after the inserts in postCRVModel finish successfully
@@ -971,12 +1110,25 @@ class ZHR_COMP_CAP_CRVEXCEP_SRV extends cds.ApplicationService {
         model_Id: modelId,
         modelOption: option
       });
+      console.log("MODEL", model[0]);
+
+
+
       if (model.length > 0) {
+        const TargetData = await SELECT.from(CRVTargets).where({ TargetTabName: model[0].targetTab || '' });
+
+        const DivisionsData = await SELECT.from(CRVDivisions).where({
+          TargetTabName: model[0].targetTab,
+          year: year
+        });
+        const Divisions = DivisionsData.map(d => d.custDivision);
+
         modelHeaders = await SELECT.from("com.compmodel.ZHR_COMP_TBL_CRV_MODEL_THRSHLD_HEADER").where({
           year: year,
           model_Id: modelId,
           modelOption: option
         });
+
         if (modelHeaders.length > 0) {
           modelItems = await SELECT.from("com.compmodel.ZHR_COMP_TBL_CRV_MODEL_THRSHLD_ITEM").where({
             year: year,
@@ -998,10 +1150,12 @@ class ZHR_COMP_CAP_CRVEXCEP_SRV extends cds.ApplicationService {
             endRange: item.endRange,
             thresholdFrom: item.percentage_val_from,
             thresholdTo: item.percentage_val_to,
-            sequence: item.sequence
+            sequence: item.sequence,
+            value: item.value,
+            basecost: item.basecost || 0.00
           });
         }
-
+        console.log("Model Headers", modelHeaders);
         // Prepare and sort headers and nested items
         const sortedModelHeaders = modelHeaders.map(header => {
           const key = `${header.custPerformancesubZone}|${header.payzones}|${header.custPDScore}`;
@@ -1036,6 +1190,7 @@ class ZHR_COMP_CAP_CRVEXCEP_SRV extends cds.ApplicationService {
           year: model[0].year,
           model_Id: model[0].model_Id,
           targetTab: model[0].targetTab,
+          custBusUnit: TargetData[0].custBusUnit,
           modelOption: model[0].modelOption,
           totalsalary: model[0].totalsalary,
           pool: model[0].pool,
@@ -1045,7 +1200,9 @@ class ZHR_COMP_CAP_CRVEXCEP_SRV extends cds.ApplicationService {
           remainingPool: model[0].remainingPool,
           remainingPool_Percentage: model[0].remainingPool_Percentage,
           status: model[0].status,
-          to_modelheader: sortedModelHeaders
+          modelName: model[0].modelName,
+          to_modelheader: sortedModelHeaders,
+          to_divisions: Divisions
         };
         console.log(response);
         return response;
@@ -1067,7 +1224,10 @@ class ZHR_COMP_CAP_CRVEXCEP_SRV extends cds.ApplicationService {
           const key = `${entry.model_Id}`;
           if (!seen.has(key)) {
             seen.add(key);
-            Models.push({ model_Id: entry.model_Id });
+            Models.push({
+              model_Id: entry.model_Id,
+              modelName: entry.modelName
+            });
           }
         });
         return Models;

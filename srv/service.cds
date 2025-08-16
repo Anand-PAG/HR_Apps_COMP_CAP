@@ -103,10 +103,26 @@ type CompTargets {
     to_divisions  : many Divisionstype;
 }
 
+type ratiowisecost          : {
+    compaRatioRanges : String(20);
+    performanceSubZone : String(10);
+    base             : Decimal(17, 2);
+    sequence         : String(3)
+};
+
+type pdpwisecost            : {
+    payzones          : String(10);
+    performanceRating : String(50);
+    totalbudget       : Decimal(17, 2);
+    count             : Integer;
+    to_ratiowise      : many ratiowisecost;
+};
+
 type targetTotals {
     year          : Integer;
     TargetTabName : String(40);
     curSalary     : Decimal(17, 2);
+    to_pdpwise    : many pdpwisecost;
 }
 
 //Raghu added this code
@@ -156,6 +172,7 @@ type getdyanamiccolumns     : {
     sequence         : String(3);
 };
 
+
 type getdyanamicModel       : {
     performanceSubZone : String(10);
     payzones           : String(10);
@@ -171,6 +188,8 @@ type getdyanamicmodelItems  : {
     endRange         : String(3);
     thresholdFrom    : Decimal(5, 2);
     thresholdTo      : Decimal(5, 2);
+    value            : Decimal(5, 2);
+    basecost         : Decimal(17, 2);
     sequence         : String(3);
 };
 
@@ -186,12 +205,17 @@ type getmodelHeader         : {
     to_columns         : many getdyanamicmodelItems;
 };
 
+type getTargetDivisions     : {
+    custDivision : String(60);
+};
+
 type getmodel               : {
     ID                          : UUID;
     year                        : Integer;
     model_Id                    : String(10);
     //key modelOption                   : String;
     targetTab                   : String(80);
+    custBusUnit                 : String(80);
     modelOption                 : String(10);
     totalsalary                 : Decimal(17, 2);
     pool                        : Decimal;
@@ -202,7 +226,9 @@ type getmodel               : {
     remainingPool_Percentage    : Decimal(3, 2);
     remainingPoolbalance        : Decimal(17, 2);
     status                      : String(1);
+    modelName                   : String;
     to_modelheader              : many getmodelHeader;
+    to_divisions                : many getTargetDivisions;
 }
 
 
@@ -222,6 +248,7 @@ type ToItemInput {
     id             : String;
     text           : String;
     value          : String;
+    basecost       : String;
     threshholdfrom : String;
     threshholdto   : String;
     startrange     : String;
@@ -243,18 +270,21 @@ type ToHeaderInput {
 }
 
 type CRVModelPayload {
-    totalsalary          : String;
-    pool                 : String;
-    pool_available       : String;
-    TotalDistributed     : String;
-    TotalDistributedPct  : String;
-    RemainingPool        : String;
-    ModelId              : String;
-    year                 : String;
-    Targettab            : String;
-    RemainingPoolPct     : String;
-    remainingPoolbalance : String;
-    to_header            : many ToHeaderInput;
+    totalsalary                 : String;
+    pool                        : String;
+    pool_available              : String;
+    totalDistributed            : String;
+    totalDistrubuted_Percentage : String;
+    remainingPool               : String;
+    ModelId                     : String;
+    year                        : String;
+    Targettab                   : String;
+    remainingPool_Percentage    : String;
+    remainingPoolbalance        : String;
+    createdname                 : String;
+    modelName                   : String;
+
+    to_header                   : many ToHeaderInput;
 }
 
 
@@ -301,7 +331,7 @@ service ZHR_COMP_CAP_CRVEXCEP_SRV {
     function readTargetTotal(year: yearfilter, TargetTabName: String(40))           returns targetTotals;
     function readcreatemodel(year: yearfilter)                                      returns array of getdyanamicModel;
     function readModelData(year: yearfilter, modelId: modelId, option: modelOption) returns getmodel;
-    function readModelId(year: yearfilter) returns array of  ModelId;
+    function readModelId(year: yearfilter)                                          returns array of ModelId;
 
 
 //entity CRV_EXCEP_FINAL as projection on compmodel.ZHR_COMP_TBL_CRV_EXCEP_FINAL;
