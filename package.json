@@ -7,7 +7,7 @@
   "private": true,
   "dependencies": {
     "@cap-js/hana": "^2",
-    "@sap/cds": "^9",
+    "@sap/cds": "^9.2.0",
     "@sap/xsenv": "^5.6.1",
     "@sap/xssec": "^4",
     "cds-swagger-ui-express": "^0.10.0",

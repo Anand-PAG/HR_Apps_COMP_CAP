@@ -5,34 +5,34 @@ using {
     managed,
 } from '@sap/cds/common';
 
-type StatusCode : String(1) enum {
-  A; // Approved
-  O; // Open
-  S; // Submitted
-  P; // Published
-  R; //Rejected
+type StatusCode  : String(1) enum {
+    A; // Approved
+    O; // Open
+    S; // Submitted
+    P; // Published
+    R; //Rejected
 }
 
-type fieldUsage : String(1) enum {
-  A; // Approved
-  D; // Open
+type fieldUsage  : String(1) enum {
+    A; // Approved
+    D; // Open
 }
 
 type fieldUsage1 : String(1) enum {
-  A; // Active
-  O; //Obsolete
-  S; // Save
+    A; // Active
+    O; //Obsolete
+    S; // Save
 };
 
 //User Management Table
 entity ZHR_COMP_TBL_USER {
-    key user_email       : String;
-    key role             : String;
+    key user_email : String;
+    key role       : String;
 }
 
 entity ZHR_COMP_TBL_CONSTANTS {
     key fileName     : String;
-    locationPath     : String;
+        locationPath : String;
 }
 
 // Threshold Master Table
@@ -68,7 +68,7 @@ entity ZHR_COMP_TBL_SUBZONE_MASTER : managed {
 // Comp Master Table
 entity ZHR_COMP_TBL_COMPRATIO_MASTER : managed {
     key ID                 : UUID;
-    key year               : Integer   @assert.range: [
+    key year               : Integer @assert.range: [
             1000,
             9999
         ];
@@ -159,7 +159,7 @@ entity ZHR_COMP_TBL_CRV_EXPTN_MASTER : managed {
 // BU Div Master Table
 entity ZHR_COMP_TBL_BUDIV_MASTER : managed {
     key ID           : UUID;
-    key year         : Integer   @assert.range: [
+    key year         : Integer @assert.range: [
             1000,
             9999
         ];
@@ -187,8 +187,8 @@ entity ZHR_COMP_TBL_TARGETTAB_MASTER : managed {
         fieldUsage    : fieldUsage1; // A - Active, O - Obsolete, S - Save
 }
 
-entity ZHR_COMP_TBL_TARGETTABS_MASTER : managed {
-    key year          : Integer   @assert.range: [
+entity ZHR_COMP_TBL_TARGETTABS_MASTER :cuid, managed {
+    key year          : Integer @assert.range: [
             1000,
             9999
         ];
@@ -257,22 +257,22 @@ entity ZHR_COMP_TBL_CRV_EXCEP_FINAL : managed {
 }
 
 entity ZHR_COMP_CRV_MODEL_NUMBERRANGE : cuid, managed {
-    key ID            : UUID;
-    key year          : Integer;
-    key Modeltype     : String(10);
-    rangefrom         : Integer @assert.range: [
+    key ID           : UUID;
+    key year         : Integer;
+    key Modeltype    : String(10);
+        rangefrom    : Integer   @assert.range: [
             0,
             9999
         ] default 0;
-    rangeto           : Integer @assert.range: [
+        rangeto      : Integer   @assert.range: [
             0,
             9999
         ] default 0;
-    currentvalue      : Integer @assert.range: [
+        currentvalue : Integer   @assert.range: [
             0,
             9999
         ] default 0;
-    status            : String(1) @assert.enum : [
+        status       : String(1) @assert.enum : [
             'D',
             'A'
         ]; //D- Draft A-Active
@@ -407,7 +407,7 @@ entity ZHR_COMP_TBL_STIP_MODEL_HEADER : cuid, managed {
     key targetTab   : String;
         totalPool   : Decimal;
         totalCost   : Decimal;
-        remaning    : Decimal;
+        remaining    : Decimal;
         status      : String;
 }
 
@@ -501,45 +501,127 @@ entity ZHR_COMP_TBL_STIP_CALIBRATION : cuid, managed {
 
 // CRV Model Calibration Table
 @cds.persistence.skip
+entity ZHR_COMP_TBL_CRV_EXPTN_FINAL : managed {
+    key ID                       : UUID;
+        custBusUnit              : String(80);
+        custDivision             : String(80);
+        custDepartment           : String(80);
+        mgrFirstName             : String(60);
+        mgrLastName              : String(60);
+        custPERNR                : Integer;
+        userName                 : String(80);
+        custHireDate             : Date;
+        jobCode                  : String(40);
+        jobTitle                 : String(80);
+        custPerformanceZone      : String(10);
+        custPerformanceSubZone   : String(10);
+        custPDScore              : String(40);
+
+        curSalary                : Decimal(17, 2) default 0.00;
+        custCurHrlySalary        : Decimal(17, 2) default 0.00;
+        custPayGradeLevel        : Integer default 0;
+        compaRatio_Percentage    : Decimal(5, 2) @assert.range: [
+            0.00,
+            500.00
+        ] default 0.00; // %curRatio
+        compaRatioGTE120         : Boolean default false; // Compa-Ratio >= 120
+        payGuideMid              : Decimal(17, 2) default 0.00;
+
+        custMeritExcepReqPct     : Decimal(5, 2) @assert.range: [
+            0.00,
+            200.00
+        ] default 0.00;
+        modeledAmount            : Decimal(17, 2) default 0.00; // Modeled $ Amount
+        newModeledAnnual         : Decimal(17, 2) default 0.00; // New Modeled Annual $
+        exception_Percentage     : Decimal(5, 2) @assert.range: [
+            0.00,
+            200.00
+        ] default 0.00; // Exception %
+        custMeritExcepReqAmt     : Decimal(17, 2) default 0.00;
+        custfinSalaryExcepReq    : Decimal(17, 2) default 0.00;
+        custMeritExcepReqComment : String;
+
+        custMeritPct             : Decimal(5, 2) @assert.range: [
+            0.00,
+            200.00
+        ] default 0.00;
+        plannedAmount            : Decimal(17, 2) default 0.00; // Planned $ Amount
+        custfinHrlyRate          : Decimal(17, 2) default 0.00;
+        finSalary                : Decimal(17, 2) default 0.00;
+        newCompaRatio_Pct        : Decimal(5, 2) @assert.range: [
+            0.00,
+            500.00
+        ] default 0.00; // %compaRatio
+        compaRatio2GTE120        : Boolean default false; // Compa Ratio >=120 (second occurrence)
+
+        meritGuideline           : String(40);
+        withinGuidelines         : Boolean default false;
+        custExceptionCode        : String(200);
+        salaryNote               : String;
+
+        lumpSum_Percentage       : Decimal(5, 2) @assert.range: [
+            0.00,
+            100.00
+        ] default 0.00; // %lumpSum
+        lumpSum                  : Decimal(17, 2) default 0.00;
+        basePayAdjustment        : Decimal(17, 2) default 0.00;
+        basePayAdjustment_Per    : Decimal(5, 2) @assert.range: [
+            0.00,
+            200.00
+        ] default 0.00; // %Base Pay Adjustment
+        finalPayAmount           : Decimal(17, 2) default 0.00; // Final Pay $
+        commentForMerit          : String;
+
+        planned_Percent          : Decimal(5, 2) @assert.range: [
+            0.00,
+            200.00
+        ] default 0.00; // Planned %3
+        exceptionCode            : String;
+        exceptionComment         : String;
+        lumpSum_Percentage1      : Decimal(5, 2) @assert.range: [
+            0.00,
+            100.00
+        ] default 0.00; // Lump Sum %6
+
+        min                      : Integer;
+        max                      : Integer;
+        budgetAmount             : Decimal(17, 2) default 0.00;
+        preCRRange               : String(50);
+}
+
+@cds.persistence.skip
 entity ZHR_COMP_TBL_CRV_CALIBRATION : cuid, managed {
     key ID                     : UUID;
     key year                   : Integer;
-        calibrationName        : String;
-        totalBudget            : Decimal;
-        totalSpend             : Decimal;
-        annualRemainingPool    : Decimal;
-        merit                  : Decimal;
-        lumpSum                : Decimal;
-        distributed_Percentage : Decimal;
-        custBusUnit            : String;
-        custDivision           : String;
-        managerName            : String;
-        jobTitle               : String;
-        custPDScore            : String;
-        performanceSubZone     : String;
-        jbCode                 : String;
-        compaRatio             : Decimal;
+        calibrationName        : String(40);
+        totalBudget            : Decimal(17, 2) default 0.00;
+        totalSpend             : Decimal(17, 2) default 0.00;
+        annualRemainingPool    : Decimal(5, 2) @assert.range: [
+            0.00,
+            100.00
+        ] default 0.00;
+        merit                  : Decimal(17, 2) default 0.00;
+        lumpSum                : Decimal(5, 2) @assert.range: [
+            0.00,
+            100.00
+        ] default 0.00;
+        distributed_Percentage : Decimal(5, 2) @assert.range: [
+            0.00,
+            100.00
+        ] default 0.00;
+        custBusUnit            : String(80);
+        custDivision           : String(80);
+        managerName            : String(80);
+        jobTitle               : String(80);
+        custPDScore            : String(40);
+        performanceSubZone     : String(10);
+        jobCode                : String(40);
+        compaRatio             : Decimal(5, 2) @assert.range: [
+            0.00,
+            100.00
+        ] default 0.00;
 }
 
-// entity ZHR_COMP_TBL_CRV_CALIBRATION : cuid, managed {
-//     key ID            : UUID;
-//     key year                   : Integer(4);
-//         calibrationName        : String(20);
-//         totalBudget            : Decimal;
-//         totalSpend             : Decimal;
-//         annualRemainingPool    : Decimal;
-//         merit                  : Decimal;
-//         lumpSum                : Decimal;
-//         distributed_Percentage : Decimal;
-//         custBusUnit            : String(60);
-//         custDivision           : String(60);
-//         managerName            : String;
-//         jobTitle               : String(60);
-//         custPDScore            : String(20);
-//         performanceSubZone     : String(10);
-//         jobCode                : String(25);
-//         compaRatio             : Decimal(6);
-// }
 
 // RSU Model Calibration Table
 @cds.persistence.skip
@@ -723,12 +805,12 @@ entity ZHR_COMP_TBL_CRV_MODEL_HEADER : cuid, managed {
         pool                        : Decimal;
         pool_available              : Decimal(17, 2) default 0.00;
         totalDistributed            : Decimal(17, 2) default 0.00;
-        totalDistrubuted_Percentage : Decimal(3, 2)  @assert.range: [
+        totalDistrubuted_Percentage : Decimal(3, 2) @assert.range: [
             0.00,
             100.00
         ] default 0.00;
         remainingPool               : Decimal(17, 2) default 0.00;
-        remainingPool_Percentage    : Decimal(3, 2)  @assert.range: [
+        remainingPool_Percentage    : Decimal(3, 2) @assert.range: [
             0.00,
             100.00
         ] default 0.00;
@@ -744,6 +826,8 @@ entity ZHR_COMP_TBL_CRV_MODEL_HEADER : cuid, managed {
         publishedon                 : Date;
         publishedcomments           : String;
         status                      : StatusCode; //O - Obselete, A- Approved,S-Save,P-Published
+        modelName              : String;
+
 
         // Composition to ZHR_COMP_TBL_CRV_MODEL_THRSHLD_HEADER
         to_ThresholdHeaders         : Composition of many ZHR_COMP_TBL_CRV_MODEL_THRSHLD_HEADER
@@ -755,7 +839,7 @@ entity ZHR_COMP_TBL_CRV_MODEL_HEADER : cuid, managed {
 // CRV Model Threshold Table
 entity ZHR_COMP_TBL_CRV_MODEL_THRSHLD_HEADER : cuid, managed {
     key ID                     : UUID;
-    key year                   : Integer   @assert.range: [
+    key year                   : Integer   @assert.range : [
             1000,
             9999
         ];
@@ -796,12 +880,13 @@ entity ZHR_COMP_TBL_CRV_MODEL_THRSHLD_ITEM : cuid, managed {
     key threshold_Id           : UUID;
         value                  : Decimal(5, 2) default 0.00;
         sequence               : String(3) @assert.format: '^[0-9]{1,3}$';
-        compaRatioRanges : String(20);
-        startRange       : String(3) @assert.format: '^[0-9]{1,3}$';
-        endRange         : String(3) @assert.format: '^[0-9]{1,3}$';
+        compaRatioRanges       : String(20);
+        startRange             : String(3) @assert.format: '^[0-9]{1,3}$';
+        endRange               : String(3) @assert.format: '^[0-9]{1,3}$';
         percentage_val_from    : Decimal(5, 2) default 0.00;
         percentage_val_to      : Decimal(5, 2) default 0.00;
         percentage_text        : String(50);
+        basecost               : Decimal(17, 2) default 0.00;
         fieldUsage             : fieldUsage;
         status                 : StatusCode; //O - Obselete, A- Approved,S-Save,P-Published
 }
