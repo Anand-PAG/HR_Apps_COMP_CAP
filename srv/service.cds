@@ -103,10 +103,26 @@ type CompTargets {
     to_divisions  : many Divisionstype;
 }
 
+type ratiowisecost          : {
+    compaRatioRanges : String(20);
+    performanceSubZone : String(10);
+    base             : Decimal(17, 2);
+    sequence         : String(3)
+};
+
+type pdpwisecost            : {
+    payzones          : String(10);
+    performanceRating : String(50);
+    totalbudget       : Decimal(17, 2);
+    count             : Integer;
+    to_ratiowise      : many ratiowisecost;
+};
+
 type targetTotals {
     year          : Integer;
     TargetTabName : String(40);
     curSalary     : Decimal(17, 2);
+    to_pdpwise    : many pdpwisecost;
 }
 
 //Raghu added this code
@@ -146,15 +162,16 @@ type ModelId {
     model_Id : String(10);
 }
 
-type getdyanamiccolumns : {
+type getdyanamiccolumns     : {
     ID               : UUID;
     compaRatioRanges : String(20);
     startRange       : String(3);
     endRange         : String(3);
-    thresholdFrom      : Decimal(5, 2);
-    thresholdTo        : Decimal(5, 2);
+    thresholdFrom    : Decimal(5, 2);
+    thresholdTo      : Decimal(5, 2);
     sequence         : String(3);
 };
+
 
 type getdyanamicModel       : {
     performanceSubZone : String(10);
@@ -164,10 +181,63 @@ type getdyanamicModel       : {
     to_columns         : many getdyanamiccolumns;
 };
 
+type getdyanamicmodelItems  : {
+    ID               : UUID;
+    compaRatioRanges : String(20);
+    startRange       : String(3);
+    endRange         : String(3);
+    thresholdFrom    : Decimal(5, 2);
+    thresholdTo      : Decimal(5, 2);
+    value            : Decimal(5, 2);
+    basecost         : Decimal(17, 2);
+    sequence         : String(3);
+};
+
+type getmodelHeader         : {
+    performanceSubZone : String(10);
+    payzones           : String(10);
+    performanceRating  : String(50);
+    sub_zonesequence   : String(3);
+    count              : Integer;
+    totalBudget        : Decimal(17, 2);
+    totalCost          : Decimal(17, 2);
+    indicator          : String(1);
+    to_columns         : many getdyanamicmodelItems;
+};
+
+type getTargetDivisions     : {
+    custDivision : String(60);
+};
+
+type getmodel               : {
+    ID                          : UUID;
+    year                        : Integer;
+    model_Id                    : String(10);
+    //key modelOption                   : String;
+    targetTab                   : String(80);
+    custBusUnit                 : String(80);
+    modelOption                 : String(10);
+    totalsalary                 : Decimal(17, 2);
+    pool                        : Decimal;
+    pool_available              : Decimal(17, 2);
+    totalDistributed            : Decimal(17, 2);
+    totalDistrubuted_Percentage : Decimal(3, 2);
+    remainingPool               : Decimal(17, 2);
+    remainingPool_Percentage    : Decimal(3, 2);
+    remainingPoolbalance        : Decimal(17, 2);
+    status                      : String(1);
+    modelName                   : String;
+    to_modelheader              : many getmodelHeader;
+    to_divisions                : many getTargetDivisions;
+}
+
 
 type yearfilter             : Integer;
 
 type Email                  : String(255);
+
+type modelId                : String(10);
+type modelOption            : String(10);
 
 type Role                   : String enum {
     approver;
@@ -178,35 +248,44 @@ type ToItemInput {
     id             : String;
     text           : String;
     value          : String;
+    basecost       : String;
     threshholdfrom : String;
     threshholdto   : String;
     startrange     : String;
     endrange       : String;
     sequence       : String;
-  }
+}
 
-  type ToHeaderInput {
+type ToHeaderInput {
     option             : String(10);
     performancesubzone : String;
     payzone            : String;
     rating             : String;
-    budget            : String;
+    budget             : String;
     total              : String;
+    count              : Integer;
     Indicator          : String;
     sequence           : String;
     to_item            : many ToItemInput;
-  }
+}
 
-  type CRVModelPayload {
-    TotalDistributed    : String;
-    TotalDistributedPct : String;
-    RemainingPool       : String;
-    ModelId             : String;
-    year                : String;
-    Targettab           : String;
-    RemainingPoolPct    : String;
-    to_header           : many ToHeaderInput;
-  }
+type CRVModelPayload {
+    totalsalary                 : String;
+    pool                        : String;
+    pool_available              : String;
+    totalDistributed            : String;
+    totalDistrubuted_Percentage : String;
+    remainingPool               : String;
+    ModelId                     : String;
+    year                        : String;
+    Targettab                   : String;
+    remainingPool_Percentage    : String;
+    remainingPoolbalance        : String;
+    createdname                 : String;
+    modelName                   : String;
+
+    to_header                   : many ToHeaderInput;
+}
 
 
 service ZHR_COMP_CAP_CRVEXCEP_SRV {
@@ -225,31 +304,34 @@ service ZHR_COMP_CAP_CRVEXCEP_SRV {
 
 
     // Custom action for bulk insert
-    action   insertMultipleThresholds(entries : array of ThresholdInput);
-    action   insertMultipleSubzones(entries : array of SubZoneInput);
-    action   insertMultipleCompensationRatioMaster(entries : array of CompensationRatioInput);
-    action   insertMultipleBusinessDivisions(entries : array of BusinessDivisionInput);
-    action   insertMultipleCRVException(entries : array of CRVExceptionInput);
-    action   insertMultipleTargetTabs(entries : array of TargetTabsInput);
-    action   clearCRVExceptions(indicator : String);
-    action   createupsertTargetTabs(nestedpayload : CompTargets);
-    action   deleteTargetTab(nestedpayload : DeleteTargetTabInput)          returns Boolean;
-    action   createnumberRange(Modeltype : String(10), year : Integer)      returns ModelId;
-      action postCRVModel(payload: CRVModelPayload) returns {
-    ok       : Boolean;
-    message  : String;
-    model_Id : String;
-  };
+    action   insertMultipleThresholds(entries: array of ThresholdInput);
+    action   insertMultipleSubzones(entries: array of SubZoneInput);
+    action   insertMultipleCompensationRatioMaster(entries: array of CompensationRatioInput);
+    action   insertMultipleBusinessDivisions(entries: array of BusinessDivisionInput);
+    action   insertMultipleCRVException(entries: array of CRVExceptionInput);
+    action   insertMultipleTargetTabs(entries: array of TargetTabsInput);
+    action   clearCRVExceptions(indicator: String);
+    action   createupsertTargetTabs(nestedpayload: CompTargets);
+    action   deleteTargetTab(nestedpayload: DeleteTargetTabInput)                   returns Boolean;
+    action   createnumberRange(Modeltype: String(10), year: Integer)                returns ModelId;
 
-    function readCompensationRatioMaster()                                  returns array of CompensationRatioMaster;
-    function readTargets(year : yearfilter)                                 returns array of CompTargets;
-    function readCRVExceptionMaster()                                       returns array of CRVException;
-    function readStatus()                                                   returns array of ModelStatus;
-    function readTargetMaster()                                             returns array of Targets;
-    function readApprovedby()                                               returns array of ApprovedData;
-    function readCreatedby()                                                returns array of createdData;
-    function readTargetTotal(year : yearfilter, TargetTabName : String(40)) returns targetTotals;
-    function readcreatemodel(year: yearfilter) returns array of getdyanamicModel;
+    action   postCRVModel(payload: CRVModelPayload)                                 returns {
+        ok       : Boolean;
+        message  : String;
+        model_Id : String;
+    };
+
+    function readCompensationRatioMaster()                                          returns array of CompensationRatioMaster;
+    function readTargets(year: yearfilter)                                          returns array of CompTargets;
+    function readCRVExceptionMaster()                                               returns array of CRVException;
+    function readStatus()                                                           returns array of ModelStatus;
+    function readTargetMaster()                                                     returns array of Targets;
+    function readApprovedby()                                                       returns array of ApprovedData;
+    function readCreatedby()                                                        returns array of createdData;
+    function readTargetTotal(year: yearfilter, TargetTabName: String(40))           returns targetTotals;
+    function readcreatemodel(year: yearfilter)                                      returns array of getdyanamicModel;
+    function readModelData(year: yearfilter, modelId: modelId, option: modelOption) returns getmodel;
+    function readModelId(year: yearfilter)                                          returns array of ModelId;
 
 
 //entity CRV_EXCEP_FINAL as projection on compmodel.ZHR_COMP_TBL_CRV_EXCEP_FINAL;

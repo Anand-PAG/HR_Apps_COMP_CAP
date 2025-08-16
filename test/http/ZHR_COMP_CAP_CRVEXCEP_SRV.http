@@ -33,50 +33,1102 @@ Content-Type: application/json
 
 {
   "payload": {
-    "TotalDistributed": "10000",
-    "TotalDistributedPct": "9",
-    "RemainingPool": "90000",
-    "ModelId": "CM20250001",
+    
+ "totalsalary": "2510672.95",
+    "pool": "4.00",
+    "pool_available": "100426.92",
+    "totalDistributed": "0.00",
+    "totalDistrubuted_Percentage": "4.00",
+    "remainingPool": "100426.92",
+    "ModelId": "CM20250047",
     "year": "2025",
-    "Targettab": "Target",
-    "RemainingPoolPct": "9",
+    "Targettab": "Target-3",
+    "remainingPool_Percentage": "4.00",
+    "remainingPoolbalance": "100426.92",
+    "createdname": "Default User",
+    "modelName": "Test",
     "to_header": [
-      {
-        "option": "Option1",
-        "performancesubzone": "6.1",
-        "payzone": "6",
-        "rating": "E/E",
-        "budget": "5000",
-        "total": "2500",
-        "Indicator": "X",
-        "sequence": "1",
-        "to_item": [
-          { "id": "", "text": "<80", "value": "100", "threshholdfrom": "0", "threshholdto": "79", "startrange": "0", "endrange": "79", "sequence": "1" }
-        ]
-      },
-      {
-        "option": "Option2",
-        "performancesubzone": "6.2",
-        "payzone": "6",
-        "rating": "E/C+",
-        "budget": "4000",
-        "total": "2000",
-        "Indicator": "Y",
-        "sequence": "1",
-        "to_item": []
-      },
-      {
-        "option": "Option3",
-        "performancesubzone": "4.1",
-        "payzone": "4",
-        "rating": "C/C+",
-        "budget": "3000",
-        "total": "1500",
-        "Indicator": "Z",
-        "sequence": "1",
-        "to_item": []
-      }
+        {
+            "option": "Option3",
+            "performancesubzone": "6.1",
+            "payzone": "6",
+            "rating": "E/E",
+            "budget": "0.00",
+            "total": "0.00",
+            "count": 0,
+            "Indicator": "0",
+            "sequence": "1",
+            "to_item": [
+                {
+                    "id": "e12efa81-9ee2-4592-aaad-e859157f220c",
+                    "text": "<80%",
+                    "value": "2.50",
+                    "threshholdfrom": "2.00",
+                    "threshholdto": "10.00",
+                    "startrange": "0",
+                    "endrange": "79",
+                    "sequence": "1"
+                },
+                {
+                    "id": "331debba-adc8-498e-b479-80ffb86c89a2",
+                    "text": "80% - <90%",
+                    "value": "2.30",
+                    "threshholdfrom": "3.00",
+                    "threshholdto": "9.00",
+                    "startrange": "80",
+                    "endrange": "89",
+                    "sequence": "2"
+                },
+                {
+                    "id": "4b057482-6732-42ca-9155-ce1fa7876f61",
+                    "text": "90% - <95%",
+                    "value": "2.10",
+                    "threshholdfrom": "2.00",
+                    "threshholdto": "8.00",
+                    "startrange": "90",
+                    "endrange": "94",
+                    "sequence": "3"
+                },
+                {
+                    "id": "d6f24a8f-30ed-43c2-a58e-4a93f244510f",
+                    "text": "95% - 105%",
+                    "value": "1.90",
+                    "threshholdfrom": "2.00",
+                    "threshholdto": "6.00",
+                    "startrange": "95",
+                    "endrange": "105",
+                    "sequence": "4"
+                },
+                {
+                    "id": "b911ac8e-83bf-4d60-a6cb-312359e17a99",
+                    "text": ">105% - 110%",
+                    "value": "1.70",
+                    "threshholdfrom": "1.00",
+                    "threshholdto": "5.00",
+                    "startrange": "106",
+                    "endrange": "110",
+                    "sequence": "5"
+                },
+                {
+                    "id": "12f6f5f3-0b57-4b55-aa20-bf651200dc52",
+                    "text": ">110% - <120%",
+                    "value": "1.50",
+                    "threshholdfrom": "0.00",
+                    "threshholdto": "4.00",
+                    "startrange": "111",
+                    "endrange": "119",
+                    "sequence": "6"
+                },
+                {
+                    "id": "97dfbc67-85d4-4414-853a-b1e9087762ff",
+                    "text": ">=120%",
+                    "value": "1.30",
+                    "threshholdfrom": "0.00",
+                    "threshholdto": "0.00",
+                    "startrange": "120",
+                    "endrange": "0",
+                    "sequence": "7"
+                }
+            ]
+        },
+        {
+            "option": "Option3",
+            "performancesubzone": "6.2",
+            "payzone": "6",
+            "rating": "E/C+,C+/E",
+            "budget": "0.00",
+            "total": "0.00",
+            "count": 0,
+            "Indicator": "0",
+            "sequence": "2",
+            "to_item": [
+                {
+                    "id": "e12efa81-9ee2-4592-aaad-e859157f220c",
+                    "text": "<80%",
+                    "value": "2.40",
+                    "threshholdfrom": "4.00",
+                    "threshholdto": "10.00",
+                    "startrange": "0",
+                    "endrange": "79",
+                    "sequence": "1"
+                },
+                {
+                    "id": "331debba-adc8-498e-b479-80ffb86c89a2",
+                    "text": "80% - <90%",
+                    "value": "2.20",
+                    "threshholdfrom": "3.00",
+                    "threshholdto": "9.00",
+                    "startrange": "80",
+                    "endrange": "89",
+                    "sequence": "2"
+                },
+                {
+                    "id": "4b057482-6732-42ca-9155-ce1fa7876f61",
+                    "text": "90% - <95%",
+                    "value": "2.00",
+                    "threshholdfrom": "2.00",
+                    "threshholdto": "8.00",
+                    "startrange": "90",
+                    "endrange": "94",
+                    "sequence": "3"
+                },
+                {
+                    "id": "d6f24a8f-30ed-43c2-a58e-4a93f244510f",
+                    "text": "95% - 105%",
+                    "value": "1.80",
+                    "threshholdfrom": "2.00",
+                    "threshholdto": "6.00",
+                    "startrange": "95",
+                    "endrange": "105",
+                    "sequence": "4"
+                },
+                {
+                    "id": "b911ac8e-83bf-4d60-a6cb-312359e17a99",
+                    "text": ">105% - 110%",
+                    "value": "1.60",
+                    "threshholdfrom": "1.00",
+                    "threshholdto": "5.00",
+                    "startrange": "106",
+                    "endrange": "110",
+                    "sequence": "5"
+                },
+                {
+                    "id": "12f6f5f3-0b57-4b55-aa20-bf651200dc52",
+                    "text": ">110% - <120%",
+                    "value": "1.40",
+                    "threshholdfrom": "0.00",
+                    "threshholdto": "4.00",
+                    "startrange": "111",
+                    "endrange": "119",
+                    "sequence": "6"
+                },
+                {
+                    "id": "97dfbc67-85d4-4414-853a-b1e9087762ff",
+                    "text": ">=120%",
+                    "value": "1.20",
+                    "threshholdfrom": "0.00",
+                    "threshholdto": "0.00",
+                    "startrange": "120",
+                    "endrange": "0",
+                    "sequence": "7"
+                }
+            ]
+        },
+        {
+            "option": "Option3",
+            "performancesubzone": "4.1",
+            "payzone": "4",
+            "rating": "C+/C,C/C+",
+            "budget": "25001.26",
+            "total": "0.00",
+            "count": 4,
+            "Indicator": "0",
+            "sequence": "3",
+            "to_item": [
+                {
+                    "id": "e12efa81-9ee2-4592-aaad-e859157f220c",
+                    "text": "<80%",
+                    "value": "2.30",
+                    "threshholdfrom": "2.00",
+                    "threshholdto": "8.00",
+                    "startrange": "0",
+                    "endrange": "79",
+                    "sequence": "1"
+                },
+                {
+                    "id": "331debba-adc8-498e-b479-80ffb86c89a2",
+                    "text": "80% - <90%",
+                    "value": "2.10",
+                    "threshholdfrom": "2.00",
+                    "threshholdto": "6.00",
+                    "startrange": "80",
+                    "endrange": "89",
+                    "sequence": "2"
+                },
+                {
+                    "id": "4b057482-6732-42ca-9155-ce1fa7876f61",
+                    "text": "90% - <95%",
+                    "value": "1.90",
+                    "threshholdfrom": "1.00",
+                    "threshholdto": "5.00",
+                    "startrange": "90",
+                    "endrange": "94",
+                    "sequence": "3"
+                },
+                {
+                    "id": "d6f24a8f-30ed-43c2-a58e-4a93f244510f",
+                    "text": "95% - 105%",
+                    "value": "1.70",
+                    "threshholdfrom": "0.00",
+                    "threshholdto": "4.00",
+                    "startrange": "95",
+                    "endrange": "105",
+                    "sequence": "4"
+                },
+                {
+                    "id": "b911ac8e-83bf-4d60-a6cb-312359e17a99",
+                    "text": ">105% - 110%",
+                    "value": "1.50",
+                    "threshholdfrom": "0.00",
+                    "threshholdto": "3.00",
+                    "startrange": "106",
+                    "endrange": "110",
+                    "sequence": "5"
+                },
+                {
+                    "id": "12f6f5f3-0b57-4b55-aa20-bf651200dc52",
+                    "text": ">110% - <120%",
+                    "value": "1.30",
+                    "threshholdfrom": "0.00",
+                    "threshholdto": "2.00",
+                    "startrange": "111",
+                    "endrange": "119",
+                    "sequence": "6"
+                },
+                {
+                    "id": "97dfbc67-85d4-4414-853a-b1e9087762ff",
+                    "text": ">=120%",
+                    "value": "1.10",
+                    "threshholdfrom": "0.00",
+                    "threshholdto": "0.00",
+                    "startrange": "120",
+                    "endrange": "0",
+                    "sequence": "7"
+                }
+            ]
+        },
+        {
+            "option": "Option3",
+            "performancesubzone": "4.2",
+            "payzone": "4",
+            "rating": "C/C,E/C-,C-/E,NR/NR,FRM",
+            "budget": "53774.22",
+            "total": "0.00",
+            "count": 8,
+            "Indicator": "0",
+            "sequence": "4",
+            "to_item": [
+                {
+                    "id": "e12efa81-9ee2-4592-aaad-e859157f220c",
+                    "text": "<80%",
+                    "value": "2.20",
+                    "threshholdfrom": "2.00",
+                    "threshholdto": "8.00",
+                    "startrange": "0",
+                    "endrange": "79",
+                    "sequence": "1"
+                },
+                {
+                    "id": "331debba-adc8-498e-b479-80ffb86c89a2",
+                    "text": "80% - <90%",
+                    "value": "2.00",
+                    "threshholdfrom": "2.00",
+                    "threshholdto": "3.00",
+                    "startrange": "80",
+                    "endrange": "89",
+                    "sequence": "2"
+                },
+                {
+                    "id": "4b057482-6732-42ca-9155-ce1fa7876f61",
+                    "text": "90% - <95%",
+                    "value": "1.80",
+                    "threshholdfrom": "1.00",
+                    "threshholdto": "5.00",
+                    "startrange": "90",
+                    "endrange": "94",
+                    "sequence": "3"
+                },
+                {
+                    "id": "d6f24a8f-30ed-43c2-a58e-4a93f244510f",
+                    "text": "95% - 105%",
+                    "value": "1.60",
+                    "threshholdfrom": "0.00",
+                    "threshholdto": "4.00",
+                    "startrange": "95",
+                    "endrange": "105",
+                    "sequence": "4"
+                },
+                {
+                    "id": "b911ac8e-83bf-4d60-a6cb-312359e17a99",
+                    "text": ">105% - 110%",
+                    "value": "1.40",
+                    "threshholdfrom": "0.00",
+                    "threshholdto": "3.00",
+                    "startrange": "106",
+                    "endrange": "110",
+                    "sequence": "5"
+                },
+                {
+                    "id": "12f6f5f3-0b57-4b55-aa20-bf651200dc52",
+                    "text": ">110% - <120%",
+                    "value": "1.20",
+                    "threshholdfrom": "0.00",
+                    "threshholdto": "2.00",
+                    "startrange": "111",
+                    "endrange": "119",
+                    "sequence": "6"
+                },
+                {
+                    "id": "97dfbc67-85d4-4414-853a-b1e9087762ff",
+                    "text": ">=120%",
+                    "value": "1.00",
+                    "threshholdfrom": "0.00",
+                    "threshholdto": "0.00",
+                    "startrange": "120",
+                    "endrange": "0",
+                    "sequence": "7"
+                }
+            ]
+        },
+        {
+            "option": "Option3",
+            "performancesubzone": "5.1",
+            "payzone": "5",
+            "rating": "E/C, C/E, C+/C+",
+            "budget": "0.00",
+            "total": "0.00",
+            "count": 0,
+            "Indicator": "0",
+            "sequence": "5",
+            "to_item": [
+                {
+                    "id": "e12efa81-9ee2-4592-aaad-e859157f220c",
+                    "text": "<80%",
+                    "value": "2.10",
+                    "threshholdfrom": "3.00",
+                    "threshholdto": "9.00",
+                    "startrange": "0",
+                    "endrange": "79",
+                    "sequence": "1"
+                },
+                {
+                    "id": "331debba-adc8-498e-b479-80ffb86c89a2",
+                    "text": "80% - <90%",
+                    "value": "1.90",
+                    "threshholdfrom": "2.00",
+                    "threshholdto": "8.00",
+                    "startrange": "80",
+                    "endrange": "89",
+                    "sequence": "2"
+                },
+                {
+                    "id": "4b057482-6732-42ca-9155-ce1fa7876f61",
+                    "text": "90% - <95%",
+                    "value": "1.70",
+                    "threshholdfrom": "0.02",
+                    "threshholdto": "6.00",
+                    "startrange": "90",
+                    "endrange": "94",
+                    "sequence": "3"
+                },
+                {
+                    "id": "d6f24a8f-30ed-43c2-a58e-4a93f244510f",
+                    "text": "95% - 105%",
+                    "value": "1.50",
+                    "threshholdfrom": "1.00",
+                    "threshholdto": "2.00",
+                    "startrange": "95",
+                    "endrange": "105",
+                    "sequence": "4"
+                },
+                {
+                    "id": "b911ac8e-83bf-4d60-a6cb-312359e17a99",
+                    "text": ">105% - 110%",
+                    "value": "1.30",
+                    "threshholdfrom": "0.00",
+                    "threshholdto": "4.00",
+                    "startrange": "106",
+                    "endrange": "110",
+                    "sequence": "5"
+                },
+                {
+                    "id": "12f6f5f3-0b57-4b55-aa20-bf651200dc52",
+                    "text": ">110% - <120%",
+                    "value": "1.10",
+                    "threshholdfrom": "0.00",
+                    "threshholdto": "3.00",
+                    "startrange": "111",
+                    "endrange": "119",
+                    "sequence": "6"
+                },
+                {
+                    "id": "97dfbc67-85d4-4414-853a-b1e9087762ff",
+                    "text": ">=120%",
+                    "value": "0.90",
+                    "threshholdfrom": "0.00",
+                    "threshholdto": "0.00",
+                    "startrange": "120",
+                    "endrange": "0",
+                    "sequence": "7"
+                }
+            ]
+        },
+        {
+            "option": "Option3",
+            "performancesubzone": "2.4",
+            "payzone": "2",
+            "rating": "C-/NI,NI/C-",
+            "budget": "0.00",
+            "total": "0.00",
+            "count": 0,
+            "Indicator": "0",
+            "sequence": "6",
+            "to_item": [
+                {
+                    "id": "e12efa81-9ee2-4592-aaad-e859157f220c",
+                    "text": "<80%",
+                    "value": "2.00",
+                    "threshholdfrom": "0.00",
+                    "threshholdto": "0.00",
+                    "startrange": "0",
+                    "endrange": "79",
+                    "sequence": "1"
+                },
+                {
+                    "id": "331debba-adc8-498e-b479-80ffb86c89a2",
+                    "text": "80% - <90%",
+                    "value": "1.80",
+                    "threshholdfrom": "0.00",
+                    "threshholdto": "0.00",
+                    "startrange": "80",
+                    "endrange": "89",
+                    "sequence": "2"
+                },
+                {
+                    "id": "4b057482-6732-42ca-9155-ce1fa7876f61",
+                    "text": "90% - <95%",
+                    "value": "1.60",
+                    "threshholdfrom": "0.00",
+                    "threshholdto": "0.00",
+                    "startrange": "90",
+                    "endrange": "94",
+                    "sequence": "3"
+                },
+                {
+                    "id": "d6f24a8f-30ed-43c2-a58e-4a93f244510f",
+                    "text": "95% - 105%",
+                    "value": "1.40",
+                    "threshholdfrom": "3.00",
+                    "threshholdto": "4.00",
+                    "startrange": "95",
+                    "endrange": "105",
+                    "sequence": "4"
+                },
+                {
+                    "id": "b911ac8e-83bf-4d60-a6cb-312359e17a99",
+                    "text": ">105% - 110%",
+                    "value": "1.20",
+                    "threshholdfrom": "0.00",
+                    "threshholdto": "0.00",
+                    "startrange": "106",
+                    "endrange": "110",
+                    "sequence": "5"
+                },
+                {
+                    "id": "12f6f5f3-0b57-4b55-aa20-bf651200dc52",
+                    "text": ">110% - <120%",
+                    "value": "1.00",
+                    "threshholdfrom": "0.00",
+                    "threshholdto": "0.00",
+                    "startrange": "111",
+                    "endrange": "119",
+                    "sequence": "6"
+                },
+                {
+                    "id": "97dfbc67-85d4-4414-853a-b1e9087762ff",
+                    "text": ">=120%",
+                    "value": "0.80",
+                    "threshholdfrom": "0.00",
+                    "threshholdto": "0.00",
+                    "startrange": "120",
+                    "endrange": "0",
+                    "sequence": "7"
+                }
+            ]
+        },
+        {
+            "option": "Option3",
+            "performancesubzone": "3.1",
+            "payzone": "3",
+            "rating": "C+/C-,C-/C+",
+            "budget": "0.00",
+            "total": "0.00",
+            "count": 0,
+            "Indicator": "0",
+            "sequence": "7",
+            "to_item": [
+                {
+                    "id": "e12efa81-9ee2-4592-aaad-e859157f220c",
+                    "text": "<80%",
+                    "value": "1.90",
+                    "threshholdfrom": "0.00",
+                    "threshholdto": "4.00",
+                    "startrange": "0",
+                    "endrange": "79",
+                    "sequence": "1"
+                },
+                {
+                    "id": "331debba-adc8-498e-b479-80ffb86c89a2",
+                    "text": "80% - <90%",
+                    "value": "1.70",
+                    "threshholdfrom": "0.00",
+                    "threshholdto": "3.00",
+                    "startrange": "80",
+                    "endrange": "89",
+                    "sequence": "2"
+                },
+                {
+                    "id": "4b057482-6732-42ca-9155-ce1fa7876f61",
+                    "text": "90% - <95%",
+                    "value": "1.50",
+                    "threshholdfrom": "0.00",
+                    "threshholdto": "2.00",
+                    "startrange": "90",
+                    "endrange": "94",
+                    "sequence": "3"
+                },
+                {
+                    "id": "d6f24a8f-30ed-43c2-a58e-4a93f244510f",
+                    "text": "95% - 105%",
+                    "value": "1.30",
+                    "threshholdfrom": "0.00",
+                    "threshholdto": "2.00",
+                    "startrange": "95",
+                    "endrange": "105",
+                    "sequence": "4"
+                },
+                {
+                    "id": "b911ac8e-83bf-4d60-a6cb-312359e17a99",
+                    "text": ">105% - 110%",
+                    "value": "1.10",
+                    "threshholdfrom": "0.00",
+                    "threshholdto": "0.00",
+                    "startrange": "106",
+                    "endrange": "110",
+                    "sequence": "5"
+                },
+                {
+                    "id": "12f6f5f3-0b57-4b55-aa20-bf651200dc52",
+                    "text": ">110% - <120%",
+                    "value": "0.90",
+                    "threshholdfrom": "0.00",
+                    "threshholdto": "0.00",
+                    "startrange": "111",
+                    "endrange": "119",
+                    "sequence": "6"
+                },
+                {
+                    "id": "97dfbc67-85d4-4414-853a-b1e9087762ff",
+                    "text": ">=120%",
+                    "value": "0.70",
+                    "threshholdfrom": "0.00",
+                    "threshholdto": "0.00",
+                    "startrange": "120",
+                    "endrange": "0",
+                    "sequence": "7"
+                }
+            ]
+        },
+        {
+            "option": "Option3",
+            "performancesubzone": "2.3",
+            "payzone": "2",
+            "rating": "C/NI,NI/C",
+            "budget": "0.00",
+            "total": "0.00",
+            "count": 0,
+            "Indicator": "0",
+            "sequence": "8",
+            "to_item": [
+                {
+                    "id": "e12efa81-9ee2-4592-aaad-e859157f220c",
+                    "text": "<80%",
+                    "value": "1.80",
+                    "threshholdfrom": "0.00",
+                    "threshholdto": "0.00",
+                    "startrange": "0",
+                    "endrange": "79",
+                    "sequence": "1"
+                },
+                {
+                    "id": "331debba-adc8-498e-b479-80ffb86c89a2",
+                    "text": "80% - <90%",
+                    "value": "1.60",
+                    "threshholdfrom": "0.00",
+                    "threshholdto": "0.00",
+                    "startrange": "80",
+                    "endrange": "89",
+                    "sequence": "2"
+                },
+                {
+                    "id": "4b057482-6732-42ca-9155-ce1fa7876f61",
+                    "text": "90% - <95%",
+                    "value": "1.40",
+                    "threshholdfrom": "0.00",
+                    "threshholdto": "0.00",
+                    "startrange": "90",
+                    "endrange": "94",
+                    "sequence": "3"
+                },
+                {
+                    "id": "d6f24a8f-30ed-43c2-a58e-4a93f244510f",
+                    "text": "95% - 105%",
+                    "value": "1.20",
+                    "threshholdfrom": "0.00",
+                    "threshholdto": "0.00",
+                    "startrange": "95",
+                    "endrange": "105",
+                    "sequence": "4"
+                },
+                {
+                    "id": "b911ac8e-83bf-4d60-a6cb-312359e17a99",
+                    "text": ">105% - 110%",
+                    "value": "1.00",
+                    "threshholdfrom": "0.00",
+                    "threshholdto": "0.00",
+                    "startrange": "106",
+                    "endrange": "110",
+                    "sequence": "5"
+                },
+                {
+                    "id": "12f6f5f3-0b57-4b55-aa20-bf651200dc52",
+                    "text": ">110% - <120%",
+                    "value": "0.80",
+                    "threshholdfrom": "0.00",
+                    "threshholdto": "0.00",
+                    "startrange": "111",
+                    "endrange": "119",
+                    "sequence": "6"
+                },
+                {
+                    "id": "97dfbc67-85d4-4414-853a-b1e9087762ff",
+                    "text": ">=120%",
+                    "value": "0.60",
+                    "threshholdfrom": "0.00",
+                    "threshholdto": "0.00",
+                    "startrange": "120",
+                    "endrange": "0",
+                    "sequence": "7"
+                }
+            ]
+        },
+        {
+            "option": "Option3",
+            "performancesubzone": "2.1",
+            "payzone": "2",
+            "rating": "E/NI,NI/E",
+            "budget": "0.00",
+            "total": "0.00",
+            "count": 0,
+            "Indicator": "0",
+            "sequence": "9",
+            "to_item": [
+                {
+                    "id": "e12efa81-9ee2-4592-aaad-e859157f220c",
+                    "text": "<80%",
+                    "value": "1.70",
+                    "threshholdfrom": "0.00",
+                    "threshholdto": "0.00",
+                    "startrange": "0",
+                    "endrange": "79",
+                    "sequence": "1"
+                },
+                {
+                    "id": "331debba-adc8-498e-b479-80ffb86c89a2",
+                    "text": "80% - <90%",
+                    "value": "1.50",
+                    "threshholdfrom": "0.00",
+                    "threshholdto": "0.00",
+                    "startrange": "80",
+                    "endrange": "89",
+                    "sequence": "2"
+                },
+                {
+                    "id": "4b057482-6732-42ca-9155-ce1fa7876f61",
+                    "text": "90% - <95%",
+                    "value": "1.30",
+                    "threshholdfrom": "0.00",
+                    "threshholdto": "0.00",
+                    "startrange": "90",
+                    "endrange": "94",
+                    "sequence": "3"
+                },
+                {
+                    "id": "d6f24a8f-30ed-43c2-a58e-4a93f244510f",
+                    "text": "95% - 105%",
+                    "value": "1.10",
+                    "threshholdfrom": "0.00",
+                    "threshholdto": "0.00",
+                    "startrange": "95",
+                    "endrange": "105",
+                    "sequence": "4"
+                },
+                {
+                    "id": "b911ac8e-83bf-4d60-a6cb-312359e17a99",
+                    "text": ">105% - 110%",
+                    "value": "0.90",
+                    "threshholdfrom": "0.00",
+                    "threshholdto": "0.00",
+                    "startrange": "106",
+                    "endrange": "110",
+                    "sequence": "5"
+                },
+                {
+                    "id": "12f6f5f3-0b57-4b55-aa20-bf651200dc52",
+                    "text": ">110% - <120%",
+                    "value": "0.70",
+                    "threshholdfrom": "0.00",
+                    "threshholdto": "0.00",
+                    "startrange": "111",
+                    "endrange": "119",
+                    "sequence": "6"
+                },
+                {
+                    "id": "97dfbc67-85d4-4414-853a-b1e9087762ff",
+                    "text": ">=120%",
+                    "value": "0.50",
+                    "threshholdfrom": "0.00",
+                    "threshholdto": "0.00",
+                    "startrange": "120",
+                    "endrange": "0",
+                    "sequence": "7"
+                }
+            ]
+        },
+        {
+            "option": "Option3",
+            "performancesubzone": "3.3",
+            "payzone": "3",
+            "rating": "C-/C-",
+            "budget": "0.00",
+            "total": "0.00",
+            "count": 0,
+            "Indicator": "0",
+            "sequence": "10",
+            "to_item": [
+                {
+                    "id": "e12efa81-9ee2-4592-aaad-e859157f220c",
+                    "text": "<80%",
+                    "value": "1.60",
+                    "threshholdfrom": "0.00",
+                    "threshholdto": "4.00",
+                    "startrange": "0",
+                    "endrange": "79",
+                    "sequence": "1"
+                },
+                {
+                    "id": "331debba-adc8-498e-b479-80ffb86c89a2",
+                    "text": "80% - <90%",
+                    "value": "1.40",
+                    "threshholdfrom": "0.00",
+                    "threshholdto": "3.00",
+                    "startrange": "80",
+                    "endrange": "89",
+                    "sequence": "2"
+                },
+                {
+                    "id": "4b057482-6732-42ca-9155-ce1fa7876f61",
+                    "text": "90% - <95%",
+                    "value": "1.20",
+                    "threshholdfrom": "0.00",
+                    "threshholdto": "2.00",
+                    "startrange": "90",
+                    "endrange": "94",
+                    "sequence": "3"
+                },
+                {
+                    "id": "d6f24a8f-30ed-43c2-a58e-4a93f244510f",
+                    "text": "95% - 105%",
+                    "value": "1.00",
+                    "threshholdfrom": "0.00",
+                    "threshholdto": "2.00",
+                    "startrange": "95",
+                    "endrange": "105",
+                    "sequence": "4"
+                },
+                {
+                    "id": "b911ac8e-83bf-4d60-a6cb-312359e17a99",
+                    "text": ">105% - 110%",
+                    "value": "0.80",
+                    "threshholdfrom": "0.00",
+                    "threshholdto": "0.00",
+                    "startrange": "106",
+                    "endrange": "110",
+                    "sequence": "5"
+                },
+                {
+                    "id": "12f6f5f3-0b57-4b55-aa20-bf651200dc52",
+                    "text": ">110% - <120%",
+                    "value": "0.60",
+                    "threshholdfrom": "0.00",
+                    "threshholdto": "0.00",
+                    "startrange": "111",
+                    "endrange": "119",
+                    "sequence": "6"
+                },
+                {
+                    "id": "97dfbc67-85d4-4414-853a-b1e9087762ff",
+                    "text": ">=120%",
+                    "value": "0.40",
+                    "threshholdfrom": "0.00",
+                    "threshholdto": "0.00",
+                    "startrange": "120",
+                    "endrange": "0",
+                    "sequence": "7"
+                }
+            ]
+        },
+        {
+            "option": "Option3",
+            "performancesubzone": "1.1",
+            "payzone": "1",
+            "rating": "NI/NI",
+            "budget": "0.00",
+            "total": "0.00",
+            "count": 0,
+            "Indicator": "0",
+            "sequence": "11",
+            "to_item": [
+                {
+                    "id": "e12efa81-9ee2-4592-aaad-e859157f220c",
+                    "text": "<80%",
+                    "value": "1.50",
+                    "threshholdfrom": "0.00",
+                    "threshholdto": "0.00",
+                    "startrange": "0",
+                    "endrange": "79",
+                    "sequence": "1"
+                },
+                {
+                    "id": "331debba-adc8-498e-b479-80ffb86c89a2",
+                    "text": "80% - <90%",
+                    "value": "1.30",
+                    "threshholdfrom": "0.00",
+                    "threshholdto": "0.00",
+                    "startrange": "80",
+                    "endrange": "89",
+                    "sequence": "2"
+                },
+                {
+                    "id": "4b057482-6732-42ca-9155-ce1fa7876f61",
+                    "text": "90% - <95%",
+                    "value": "1.10",
+                    "threshholdfrom": "0.00",
+                    "threshholdto": "0.00",
+                    "startrange": "90",
+                    "endrange": "94",
+                    "sequence": "3"
+                },
+                {
+                    "id": "d6f24a8f-30ed-43c2-a58e-4a93f244510f",
+                    "text": "95% - 105%",
+                    "value": "0.90",
+                    "threshholdfrom": "0.00",
+                    "threshholdto": "0.00",
+                    "startrange": "95",
+                    "endrange": "105",
+                    "sequence": "4"
+                },
+                {
+                    "id": "b911ac8e-83bf-4d60-a6cb-312359e17a99",
+                    "text": ">105% - 110%",
+                    "value": "0.70",
+                    "threshholdfrom": "0.00",
+                    "threshholdto": "0.00",
+                    "startrange": "106",
+                    "endrange": "110",
+                    "sequence": "5"
+                },
+                {
+                    "id": "12f6f5f3-0b57-4b55-aa20-bf651200dc52",
+                    "text": ">110% - <120%",
+                    "value": "0.50",
+                    "threshholdfrom": "0.00",
+                    "threshholdto": "0.00",
+                    "startrange": "111",
+                    "endrange": "119",
+                    "sequence": "6"
+                },
+                {
+                    "id": "97dfbc67-85d4-4414-853a-b1e9087762ff",
+                    "text": ">=120%",
+                    "value": "0.30",
+                    "threshholdfrom": "0.00",
+                    "threshholdto": "0.00",
+                    "startrange": "120",
+                    "endrange": "0",
+                    "sequence": "7"
+                }
+            ]
+        },
+        {
+            "option": "Option3",
+            "performancesubzone": "3.2",
+            "payzone": "3",
+            "rating": "C/C-,C-/C",
+            "budget": "0.00",
+            "total": "0.00",
+            "count": 0,
+            "Indicator": "0",
+            "sequence": "12",
+            "to_item": [
+                {
+                    "id": "e12efa81-9ee2-4592-aaad-e859157f220c",
+                    "text": "<80%",
+                    "value": "1.40",
+                    "threshholdfrom": "0.00",
+                    "threshholdto": "4.00",
+                    "startrange": "0",
+                    "endrange": "79",
+                    "sequence": "1"
+                },
+                {
+                    "id": "331debba-adc8-498e-b479-80ffb86c89a2",
+                    "text": "80% - <90%",
+                    "value": "1.20",
+                    "threshholdfrom": "0.00",
+                    "threshholdto": "3.00",
+                    "startrange": "80",
+                    "endrange": "89",
+                    "sequence": "2"
+                },
+                {
+                    "id": "4b057482-6732-42ca-9155-ce1fa7876f61",
+                    "text": "90% - <95%",
+                    "value": "1.00",
+                    "threshholdfrom": "1.00",
+                    "threshholdto": "2.00",
+                    "startrange": "90",
+                    "endrange": "94",
+                    "sequence": "3"
+                },
+                {
+                    "id": "d6f24a8f-30ed-43c2-a58e-4a93f244510f",
+                    "text": "95% - 105%",
+                    "value": "0.80",
+                    "threshholdfrom": "0.00",
+                    "threshholdto": "2.00",
+                    "startrange": "95",
+                    "endrange": "105",
+                    "sequence": "4"
+                },
+                {
+                    "id": "b911ac8e-83bf-4d60-a6cb-312359e17a99",
+                    "text": ">105% - 110%",
+                    "value": "0.60",
+                    "threshholdfrom": "0.00",
+                    "threshholdto": "0.00",
+                    "startrange": "106",
+                    "endrange": "110",
+                    "sequence": "5"
+                },
+                {
+                    "id": "12f6f5f3-0b57-4b55-aa20-bf651200dc52",
+                    "text": ">110% - <120%",
+                    "value": "0.40",
+                    "threshholdfrom": "0.00",
+                    "threshholdto": "0.00",
+                    "startrange": "111",
+                    "endrange": "119",
+                    "sequence": "6"
+                },
+                {
+                    "id": "97dfbc67-85d4-4414-853a-b1e9087762ff",
+                    "text": ">=120%",
+                    "value": "0.20",
+                    "threshholdfrom": "0.00",
+                    "threshholdto": "0.00",
+                    "startrange": "120",
+                    "endrange": "0",
+                    "sequence": "7"
+                }
+            ]
+        },
+        {
+            "option": "Option3",
+            "performancesubzone": "2.2",
+            "payzone": "2",
+            "rating": "C+/NI,NI/C+",
+            "budget": "0.00",
+            "total": "0.00",
+            "count": 0,
+            "Indicator": "0",
+            "sequence": "13",
+            "to_item": [
+                {
+                    "id": "e12efa81-9ee2-4592-aaad-e859157f220c",
+                    "text": "<80%",
+                    "value": "1.30",
+                    "threshholdfrom": "0.00",
+                    "threshholdto": "0.00",
+                    "startrange": "0",
+                    "endrange": "79",
+                    "sequence": "1"
+                },
+                {
+                    "id": "331debba-adc8-498e-b479-80ffb86c89a2",
+                    "text": "80% - <90%",
+                    "value": "1.10",
+                    "threshholdfrom": "0.00",
+                    "threshholdto": "0.00",
+                    "startrange": "80",
+                    "endrange": "89",
+                    "sequence": "2"
+                },
+                {
+                    "id": "4b057482-6732-42ca-9155-ce1fa7876f61",
+                    "text": "90% - <95%",
+                    "value": "0.90",
+                    "threshholdfrom": "0.00",
+                    "threshholdto": "0.00",
+                    "startrange": "90",
+                    "endrange": "94",
+                    "sequence": "3"
+                },
+                {
+                    "id": "d6f24a8f-30ed-43c2-a58e-4a93f244510f",
+                    "text": "95% - 105%",
+                    "value": "0.70",
+                    "threshholdfrom": "0.00",
+                    "threshholdto": "0.00",
+                    "startrange": "95",
+                    "endrange": "105",
+                    "sequence": "4"
+                },
+                {
+                    "id": "b911ac8e-83bf-4d60-a6cb-312359e17a99",
+                    "text": ">105% - 110%",
+                    "value": "0.50",
+                    "threshholdfrom": "0.00",
+                    "threshholdto": "0.00",
+                    "startrange": "106",
+                    "endrange": "110",
+                    "sequence": "5"
+                },
+                {
+                    "id": "12f6f5f3-0b57-4b55-aa20-bf651200dc52",
+                    "text": ">110% - <120%",
+                    "value": "0.30",
+                    "threshholdfrom": "0.00",
+                    "threshholdto": "0.00",
+                    "startrange": "111",
+                    "endrange": "119",
+                    "sequence": "6"
+                },
+                {
+                    "id": "97dfbc67-85d4-4414-853a-b1e9087762ff",
+                    "text": ">=120%",
+                    "value": "0.10",
+                    "threshholdfrom": "0.00",
+                    "threshholdto": "0.00",
+                    "startrange": "120",
+                    "endrange": "0",
+                    "sequence": "7"
+                }
+            ]
+        }
     ]
+
   }
 }
 
@@ -303,7 +1355,7 @@ Content-Type: application/json
 
 { 
   "year" : 2025,
-  "TargetTabName" : "Target-3"
+  "TargetTabName" : "Target 5"
 }
 
 ### READ from Totals
@@ -313,6 +1365,26 @@ Content-Type: application/json
 
 { 
   "year" : 2025
+}
+
+### READ from Totals
+
+GET {{svc}}/readModelId
+Content-Type: application/json
+
+{ 
+  "year" : 2025
+}
+
+### READ from Totals
+
+GET {{svc}}/readModelData
+Content-Type: application/json
+
+{ 
+  "year" : 2025,
+  "modelId" : "CM20250048",
+  "option":"Option1"
 }
 
 ### Post Number Range
@@ -424,4 +1496,13 @@ Content-Type: application/json
         }
       ]
   }
+}
+
+### READ from CALC
+
+GET {{svc}}/readCalculation1
+Content-Type: application/json
+
+{
+  "TargetTabName": ""
 }
